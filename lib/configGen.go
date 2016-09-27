@@ -3,13 +3,20 @@ package lib
 import (
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	// "net/http"
+	"encoding/json"
+	"github.com/google/go-github/github"
+	"io/ioutil"
 	"os"
+	osuser "os/user"
+	"time"
 )
 
+// User ..
 type User struct {
 	GithubID   int       `json:"githubID"`
 	ForgitPath string    `json:"forgitPath"`
+	UpdateTime string    `json:"updateTime"`
 	Settings   []Setting `json:"settings,omitempty"`
 }
 
@@ -51,30 +58,113 @@ type SettingRepo struct {
 	Status       int     `json:"status"`
 }
 
-// BuildConfig ...
-func BuildConfig() {
+func fileExist(path string) string {
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		os.Exit(1)
+		// return
+	}
+	var u []User
+	json.Unmarshal(file, &u)
+	filebytes, err := json.Marshal(u)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	return string(filebytes)
+}
+
+func notExist(path string) {
 	var (
-		settingRepos        = []SettingRepo{}
-		settings            = []Setting{}
-		currentUserSettings = Setting{}
+		f            *os.File
+		err          error
+		settingRepos = []SettingRepo{}
+		settings     = []Setting{}
 	)
 
-	file, err := os.Open(*filename)
+	f, err = os.Create(path)
 	if err != nil {
-		if len(*filename) > 1 {
-			fmt.Printf("Error: could not read config file %s.\n", *filename)
+		fmt.Println(err)
+	}
+	defer f.Close()
+
+	// set the time
+	for s := range settings {
+		// Create json
+		for r := range settings[s].Repos {
+			userSettingsRepo := SettingRepo{
+				GithubRepoID: settings[s].Repos[s].ID,
+				Name:         settings[s].Repos[s].Name,
+				Status:       settings[s].Repos[s].Status,
+			}
+			settingRepos = append(settingRepos, userSettingsRepo)
 		}
-		return
+
+		userSetting := Setting{
+			SettingID: settings[s].ID,
+			Name:      settings[s].Name,
+			Status:    settings[s].Status,
+			SettingNotifications: SettingNotifications{
+				Status:   settings[s].SettingNotifications.Status,
+				OnError:  settings[s].SettingNotifications.OnError,
+				OnCommit: settings[s].SettingNotifications.OnCommit,
+				OnPush:   settings[s].SettingNotifications.OnPush,
+			},
+			SettingAddPullCommit: SettingAddPullCommit{
+				Status:  settings[s].SettingAddPullCommit.Status,
+				TimeMin: settings[s].SettingAddPullCommit.TimeMin,
+			},
+			SettingPush: SettingPush{
+				Status:  settings[s].SettingPush.Status,
+				TimeMin: settings[s].SettingPush.TimeMin,
+			},
+			Repos: settingRepos,
+		}
+		settings = append(settings, userSetting)
 	}
-	defer file.Close()
-	decoder := json.NewDecoder(file)
-	// Overwrite the defaults
-	if err := decoder.Decode(&c); err == io.EOF {
-		fmt.Println(err)
-	} else if err != nil {
+
+	location, err := time.LoadLocation("America/New_York")
+	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(c.String())
+	timenow := &github.Timestamp{time.Now().In(location)}
+	user := &User{
+		GithubID:   12345,
+		ForgitPath: fPath,
+		UpdateTime: timenow.String(),
+		Settings:   settings,
+	}
+	// move file
+
+	d2 := []byte{115, 111, 109, 101, 10}
+	n2, err = f.Write(user)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("wrote %d bytes\n", n2)
+	f.Sync()
+	fmt.Println("created")
+}
+
+// BuildConfig ...
+func BuildConfig(forgitPath string) {
+	// Get Home Directory
+	homeDir, err := osuser.Current()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	//IF config file doesn't exist. Create it
+	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
+		fileNotExist(homeDir.HomeDir + "/.forgitConf.json")
+		fmt.Println("Nope")
+		os.Exit(1)
+	}
+
+	// File Exists
+	p := fileExist(homeDir.HomeDir + "/.forgitConf.json")
+	fmt.Println(p)
 
 	// Curl Call
 	// resp, err := http.Get("https://api.github.com/users/kwtucker")
@@ -86,8 +176,4 @@ func BuildConfig() {
 	//
 	// _, err = os.Stdout.Write(body)
 	// checkError(err)
-
-	for k := range settings {
-
-	}
 }
