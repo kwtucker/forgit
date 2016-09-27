@@ -9,7 +9,7 @@ import (
 
 func isPath(p string) bool {
 	switch string(p[0]) {
-	case "/", ".", "~":
+	case "/":
 		return true
 	}
 	return false
@@ -28,9 +28,8 @@ func Init() {
 	}
 	reader = bufio.NewReader(os.Stdin)
 	fmt.Println("Your Current Absolute Path is ->", currentDir)
-	fmt.Println("Path can be a relative or absolute path.")
 	fmt.Println("-=-=-")
-	fmt.Print("Path to your Forgit Directory: ")
+	fmt.Print("Enter Absolute Path to your Forgit Directory: ")
 
 	path, err = reader.ReadString('\n')
 	if err != nil {
@@ -41,12 +40,13 @@ func Init() {
 	if !valid {
 		fmt.Println()
 		fmt.Println()
-		fmt.Println("NOT VALID PATH. Must start with '.' , '/' , '~'")
-		fmt.Println("Example: ~/Desktop/Forgit/")
+		fmt.Println("NOT VALID PATH. Absolute Path ONLY")
+		fmt.Println("Example: /Users/kevintucker/Desktop/")
 		fmt.Println("Suggest going to the Forgit Directory and running pwd command to get its path")
 		fmt.Println("[ or ]")
 		fmt.Println("Run Again --> fgt init")
 		return
 	}
 	fmt.Println(path)
+	BuildConfig(path)
 }
