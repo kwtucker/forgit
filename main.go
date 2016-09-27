@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-
+	"github.com/kwtucker/fgt/lib"
 	"github.com/urfave/cli"
+	"os"
 )
 
 func hello() {
@@ -22,14 +22,12 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-
 		{
-			Name:    "stop",
+			Name:    "init",
 			Aliases: []string{"sp"},
 			Usage:   "Stop Forgit",
 			Action: func(c *cli.Context) error {
-				fmt.Println("completed task: ", c.Args().First())
-				hello()
+				lib.Init()
 				return nil
 			},
 		},
@@ -50,6 +48,15 @@ func main() {
 					Value: "5",
 					Usage: "--> Set Push repeat time *minutes |",
 				},
+			},
+		},
+		{
+			Name:    "stop",
+			Aliases: []string{"sp"},
+			Usage:   "Stop Forgit",
+			Action: func(c *cli.Context) error {
+				fmt.Println("completed task: ", c.Args().First())
+				return nil
 			},
 		},
 	}
