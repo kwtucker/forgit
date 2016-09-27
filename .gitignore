@@ -6,6 +6,7 @@
 *.o
 *.a
 *.so
+.forgitConf.json
 
 # Folders
 _obj
