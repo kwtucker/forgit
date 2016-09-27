@@ -5,11 +5,9 @@ import (
 	"io/ioutil"
 	// "net/http"
 	"encoding/json"
-	"github.com/google/go-github/github"
-	"io/ioutil"
+	// "io/ioutil"
 	"os"
 	osuser "os/user"
-	"time"
 )
 
 // User ..
@@ -22,13 +20,13 @@ type User struct {
 
 // Setting ...
 type Setting struct {
-	SettingID int    `json:"setting_id"`
-	Name      string `json:"name"`
-	Status    int    `json:"status"`
-	SettingNotifications
-	SettingAddPullCommit
-	SettingPush
-	Repos []SettingRepo
+	SettingID            int            `json:"setting_id"`
+	Name                 string         `json:"name"`
+	Status               int            `json:"status"`
+	SettingNotifications map[string]int `json:"notifications"`
+	SettingAddPullCommit map[string]int `json:"addPullCommit"`
+	SettingPush          map[string]int `json:"push"`
+	Repos                []SettingRepo  `json:"repos"`
 }
 
 // SettingNotifications ...
@@ -58,90 +56,58 @@ type SettingRepo struct {
 	Status       int     `json:"status"`
 }
 
-func fileExist(path string) string {
+// Tells the user that the file exists and returns the config data
+func fileExist(path string) []byte {
+	var (
+		u []User
+	)
+
+	// Read the config file in home dir
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		os.Exit(1)
-		// return
 	}
-	var u []User
+
+	// Set to user struct
 	json.Unmarshal(file, &u)
-	filebytes, err := json.Marshal(u)
+	filebytes, err := json.MarshalIndent(u, "", "    ")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	return string(filebytes)
+	return filebytes
 }
 
-func notExist(path string) {
+// Creates a config file and puts server data to it.
+func fileNotExist(path string, j []byte) {
 	var (
-		f            *os.File
-		err          error
-		settingRepos = []SettingRepo{}
-		settings     = []Setting{}
+		f     *os.File
+		err   error
+		jsonU []User
 	)
 
+	// set data to the user struct and indent format
+	json.Unmarshal(j, &jsonU)
+	filebytes, err := json.MarshalIndent(jsonU, "", "    ")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	// Create the file and defer close
 	f, err = os.Create(path)
 	if err != nil {
 		fmt.Println(err)
 	}
+	// defer file close tell end of function
 	defer f.Close()
 
-	// set the time
-	for s := range settings {
-		// Create json
-		for r := range settings[s].Repos {
-			userSettingsRepo := SettingRepo{
-				GithubRepoID: settings[s].Repos[s].ID,
-				Name:         settings[s].Repos[s].Name,
-				Status:       settings[s].Repos[s].Status,
-			}
-			settingRepos = append(settingRepos, userSettingsRepo)
-		}
-
-		userSetting := Setting{
-			SettingID: settings[s].ID,
-			Name:      settings[s].Name,
-			Status:    settings[s].Status,
-			SettingNotifications: SettingNotifications{
-				Status:   settings[s].SettingNotifications.Status,
-				OnError:  settings[s].SettingNotifications.OnError,
-				OnCommit: settings[s].SettingNotifications.OnCommit,
-				OnPush:   settings[s].SettingNotifications.OnPush,
-			},
-			SettingAddPullCommit: SettingAddPullCommit{
-				Status:  settings[s].SettingAddPullCommit.Status,
-				TimeMin: settings[s].SettingAddPullCommit.TimeMin,
-			},
-			SettingPush: SettingPush{
-				Status:  settings[s].SettingPush.Status,
-				TimeMin: settings[s].SettingPush.TimeMin,
-			},
-			Repos: settingRepos,
-		}
-		settings = append(settings, userSetting)
-	}
-
-	location, err := time.LoadLocation("America/New_York")
+	// Write to file and not set a var
+	_, err = f.Write(filebytes)
 	if err != nil {
 		fmt.Println(err)
 	}
-	timenow := &github.Timestamp{time.Now().In(location)}
-	user := &User{
-		GithubID:   12345,
-		ForgitPath: fPath,
-		UpdateTime: timenow.String(),
-		Settings:   settings,
-	}
-	// move file
-
-	d2 := []byte{115, 111, 109, 101, 10}
-	n2, err = f.Write(user)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Printf("wrote %d bytes\n", n2)
+	// save
 	f.Sync()
 	fmt.Println("created")
 }
@@ -156,24 +122,28 @@ func BuildConfig(forgitPath string) {
 	}
 
 	//IF config file doesn't exist. Create it
-	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
-		fileNotExist(homeDir.HomeDir + "/.forgitConf.json")
-		fmt.Println("Nope")
-		os.Exit(1)
+	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf2.json"); os.IsNotExist(err) {
+		// // Curl call that I am hooking up to forgit server later
+		// resp, err := http.Get("https://api.github.com/users/kwtucker")
+		// defer resp.Body.Close()
+		// checkError(err)
+		//
+		// databytes, err := ioutil.ReadAll(resp.Body)
+		// if err != nil {
+		//   fmt.Println(err)
+		// 	os.Exit(1)
+		// })
+		// fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", databytes)
+
+		// NOTE: need to replace p with curl call
+		p := fileExist(homeDir.HomeDir + "/.forgitConf.json")
+		fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", p)
+
 	}
 
-	// File Exists
+	// File Exists Print
 	p := fileExist(homeDir.HomeDir + "/.forgitConf.json")
-	fmt.Println(p)
+	fmt.Println("Your Config already exists in --> " + homeDir.HomeDir)
+	fmt.Println(string(p))
 
-	// Curl Call
-	// resp, err := http.Get("https://api.github.com/users/kwtucker")
-	// defer resp.Body.Close()
-	// checkError(err)
-	//
-	// body, err := ioutil.ReadAll(resp.Body)
-	// checkError(err)
-	//
-	// _, err = os.Stdout.Write(body)
-	// checkError(err)
 }
