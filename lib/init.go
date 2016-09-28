@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	// "strings"
 )
 
 func isPath(p string) bool {
@@ -18,35 +17,34 @@ func isPath(p string) bool {
 // Init ...
 func Init() {
 	var (
-		err    error
-		reader *bufio.Reader
-		path   string
+		err     error
+		scanner *bufio.Scanner
+		path    string
 	)
 	currentDir, err := os.Getwd()
 	if err != nil {
 		fmt.Println(err)
 	}
-	reader = bufio.NewReader(os.Stdin)
-	fmt.Println("Your Current Absolute Path is ->", currentDir)
-	fmt.Println("-=-=-")
-	fmt.Print("Enter Absolute Path to your Forgit Directory: ")
-
-	path, err = reader.ReadString('\n')
-	if err != nil {
-		fmt.Println(err)
-	}
+	scanner = bufio.NewScanner(os.Stdin)
+	fmt.Println("<> Your Current Absolute Path is ->", currentDir)
+	fmt.Println("<>")
+	fmt.Print("<> Enter Absolute Path to your Forgit Directory: ")
+	scanner.Scan()
+	path = scanner.Text()
 
 	valid := isPath(path)
 	if !valid {
-		fmt.Println()
-		fmt.Println()
-		fmt.Println("NOT VALID PATH. Absolute Path ONLY")
-		fmt.Println("Example: /Users/kevintucker/Desktop/")
-		fmt.Println("Suggest going to the Forgit Directory and running pwd command to get its path")
-		fmt.Println("[ or ]")
-		fmt.Println("Run Again --> fgt init")
+		fmt.Println("[]")
+		fmt.Println("[]")
+		fmt.Println("[] NOT VALID PATH. Absolute Path ONLY")
+		fmt.Println("** Example: /Users/CURRENT-USER/Desktop/Forgit/")
+		fmt.Println("[]")
+		fmt.Println("[] Suggest going to the Forgit Directory and running pwd command to get its path.")
+		fmt.Println("   [ or ]")
+		fmt.Println("[] Try Again --> fgt init")
 		return
 	}
-	fmt.Println(path)
-	BuildConfig(path)
+
+	// build the config
+	BuildConfig(string(path))
 }

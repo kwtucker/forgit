@@ -5,9 +5,10 @@ import (
 	"io/ioutil"
 	// "net/http"
 	"encoding/json"
-	// "io/ioutil"
 	"os"
 	osuser "os/user"
+	"strconv"
+	"time"
 )
 
 // User ..
@@ -57,25 +58,94 @@ type SettingRepo struct {
 }
 
 // Tells the user that the file exists and returns the config data
-func fileExist(path string) []byte {
+func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte {
+
 	var (
-		u []User
+		fileu []User
+		datau []User
 	)
-
+	//-=-=-=-=- TEMP to get test data from file -=-=-=-=-=-=-=
 	// Read the config file in home dir
-	file, err := ioutil.ReadFile(path)
+	testfile, err := ioutil.ReadFile(homeDir + "/.forgitConfTest.json")
+	if err != nil {
+		os.Exit(1)
+	}
+	// -=--=-=--END TEMP -=-=-=-=-=-=-=-
+
+	existfile, err := ioutil.ReadFile(homeDir + "/.forgitConf.json")
 	if err != nil {
 		os.Exit(1)
 	}
 
-	// Set to user struct
-	json.Unmarshal(file, &u)
-	filebytes, err := json.MarshalIndent(u, "", "    ")
+	// data from api
+	json.Unmarshal(testfile, &datau)
+	// Set to user struct for local file
+	json.Unmarshal(existfile, &fileu)
+	location, err := time.LoadLocation("America/New_York")
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		fmt.Println(err)
 	}
-	return filebytes
+
+	// parse the string timestamp to a int64 unix
+	fut, err := strconv.ParseInt(fileu[0].UpdateTime, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	dut, err := strconv.ParseInt(datau[0].UpdateTime, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	// convert to a time.Time struct for comparing
+	fileUpdateTime := time.Unix(fut, 0)
+	dataUpdateTime := time.Unix(dut, 0)
+
+	// get unix time and convert it to a string for storage
+	dn := time.Now().In(location).Unix()
+	dateNow := strconv.FormatInt(dn, 10)
+
+	if fileUpdateTime.After(dataUpdateTime) {
+		// Update the path in json
+		fileu[0].ForgitPath = forgitPath
+		fileu[0].UpdateTime = dateNow
+
+		// git byte array from MarshalIndent
+		databytes, err := json.MarshalIndent(fileu, "", "    ")
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		// write to file with updated info
+		err = ioutil.WriteFile(path, databytes, 0644)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		return databytes
+	}
+
+	if fileUpdateTime.Before(dataUpdateTime) {
+		// TODO: Need to sent post curl to api with new data and update mongodb on server
+
+		//-=-=-=-=- TEMP to update test data from file -=-=-=-=-=-=-=
+		// Update the path in json
+		datau[0].ForgitPath = forgitPath
+		datau[0].UpdateTime = dateNow
+		// git byte array from MarshalIndent
+		databytes, err := json.MarshalIndent(datau, "", "    ")
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		err = ioutil.WriteFile(path, databytes, 0644)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		// -=--=-=--END TEMP -=-=-=-=-=-=-=-
+		return databytes
+	}
+	return nil
 }
 
 // Creates a config file and puts server data to it.
@@ -121,29 +191,57 @@ func BuildConfig(forgitPath string) {
 		os.Exit(1)
 	}
 
+	// // Curl call that I am hooking up to forgit server later
+	// resp, err := http.Get("https://api.github.com/users/kwtucker")
+	// defer resp.Body.Close()
+	// checkError(err)
+	//
+	// databytes, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	//   fmt.Println(err)
+	// 	os.Exit(1)
+	// })
+	// fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", databytes)
+
 	//IF config file doesn't exist. Create it
-	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf2.json"); os.IsNotExist(err) {
-		// // Curl call that I am hooking up to forgit server later
-		// resp, err := http.Get("https://api.github.com/users/kwtucker")
-		// defer resp.Body.Close()
-		// checkError(err)
-		//
-		// databytes, err := ioutil.ReadAll(resp.Body)
-		// if err != nil {
-		//   fmt.Println(err)
-		// 	os.Exit(1)
-		// })
-		// fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", databytes)
+	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
 
-		// NOTE: need to replace p with curl call
-		p := fileExist(homeDir.HomeDir + "/.forgitConf.json")
-		fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", p)
+		var (
+			u []User
+		)
 
+		// Read the config file in home dir
+		file, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConfTest.json")
+		if err != nil {
+			os.Exit(1)
+		}
+
+		// Set to user struct for local file
+		json.Unmarshal(file, &u)
+
+		// data from api
+		// json.Unmarshal(data, &u)
+		// Update the path in json
+		u[0].ForgitPath = forgitPath
+		location, err := time.LoadLocation("America/New_York")
+		if err != nil {
+			fmt.Println(err)
+		}
+		u[0].UpdateTime = string(time.Now().In(location).Unix())
+
+		// git byte array from MarshalIndent
+		databytes, err := json.MarshalIndent(u, "", "    ")
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+
+		fileNotExist(homeDir.HomeDir+"/.forgitConf.json", databytes)
 	}
-
+	var curldata []byte
 	// File Exists Print
-	p := fileExist(homeDir.HomeDir + "/.forgitConf.json")
-	fmt.Println("Your Config already exists in --> " + homeDir.HomeDir)
+	p := fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, curldata, homeDir.HomeDir)
+	fmt.Println("Your Config already exists in --> " + homeDir.HomeDir + "/.forgitConf.json")
 	fmt.Println(string(p))
 
 }

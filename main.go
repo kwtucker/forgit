@@ -7,17 +7,33 @@ import (
 	"os"
 )
 
-func hello() {
-	fmt.Println("hello")
-}
-
 func main() {
+	logo :=
+		`
+    '.:/:.'
+    ooo+ooo
+    ossssso
+  '.'-/o/-'.'
+//+++/- -/+++//
+sssosso ossosss
+/sssso: :ossss/
+  .-'.:/:.'-.
+    oo+++oo
+    ossssso
+    ':+s+:'
+`
+
 	app := cli.NewApp()
 	app.Name = "Forgit CLI"
 	app.Usage = "Never Forget To Commit"
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
-		fmt.Println("Welcome, Let's GIT to it.")
+		fmt.Println(logo)
+
+		fmt.Println("\tWelcome to Forgit CLI 🍺")
+		fmt.Println("\t  Let's GIT to it!")
+		fmt.Println("     > fgt help [-h, h, --help]")
+		fmt.Println()
 		return nil
 	}
 
