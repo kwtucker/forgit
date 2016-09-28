@@ -39,9 +39,7 @@ sssosso ossosss
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "init",
-			Aliases: []string{"sp"},
-			Usage:   "Stop Forgit",
+			Name: "init",
 			Action: func(c *cli.Context) error {
 				lib.Init()
 				return nil
@@ -53,6 +51,10 @@ sssosso ossosss
 			Usage:       "Start Forgit",
 			Description: "Starts app and automates based on you forgit settings.",
 			ArgsUsage:   "NUMBER-MINUTES",
+			Action: func(c *cli.Context) error {
+				fmt.Println("fgt start is Coming Soon")
+				return nil
+			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "commit, c",
@@ -71,7 +73,8 @@ sssosso ossosss
 			Aliases: []string{"sp"},
 			Usage:   "Stop Forgit",
 			Action: func(c *cli.Context) error {
-				fmt.Println("completed task: ", c.Args().First())
+				// fmt.Println("completed task: ", c.Args().First())
+				fmt.Println("fgt stop is Coming Soon")
 				return nil
 			},
 		},
