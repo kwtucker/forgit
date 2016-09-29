@@ -61,9 +61,16 @@ type SettingRepo struct {
 func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte {
 
 	var (
-		fileu []User
-		datau []User
+		fileu   []User
+		datau   []User
+		dn      int64
+		dateNow string
 	)
+
+	// get unix time and convert it to a string for storage
+	dn = time.Now().UTC().Unix()
+	dateNow = strconv.FormatInt(dn, 10)
+
 	//-=-=-=-=- TEMP to get test data from file -=-=-=-=-=-=-=
 	// Read the config file in home dir
 	testfile, err := ioutil.ReadFile(homeDir + "/.forgitConfTest.json")
@@ -81,10 +88,6 @@ func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte 
 	json.Unmarshal(testfile, &datau)
 	// Set to user struct for local file
 	json.Unmarshal(existfile, &fileu)
-	location, err := time.LoadLocation("America/New_York")
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	// parse the string timestamp to a int64 unix
 	fut, err := strconv.ParseInt(fileu[0].UpdateTime, 10, 64)
@@ -100,10 +103,6 @@ func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte 
 	fileUpdateTime := time.Unix(fut, 0)
 	dataUpdateTime := time.Unix(dut, 0)
 
-	// get unix time and convert it to a string for storage
-	dn := time.Now().In(location).Unix()
-	dateNow := strconv.FormatInt(dn, 10)
-
 	if fileUpdateTime.After(dataUpdateTime) {
 		// Update the path in json
 		fileu[0].ForgitPath = forgitPath
@@ -115,7 +114,8 @@ func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte 
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		// write to file with updated info
+
+		// Write to file with updated info
 		err = ioutil.WriteFile(path, databytes, 0644)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -223,11 +223,9 @@ func BuildConfig(forgitPath string) {
 		// json.Unmarshal(data, &u)
 		// Update the path in json
 		u[0].ForgitPath = forgitPath
-		location, err := time.LoadLocation("America/New_York")
-		if err != nil {
-			fmt.Println(err)
-		}
-		u[0].UpdateTime = string(time.Now().In(location).Unix())
+		now := time.Now().UTC().Unix()
+		nowString := strconv.FormatInt(dn, 10)
+		u[0].UpdateTime = nowString
 
 		// git byte array from MarshalIndent
 		databytes, err := json.MarshalIndent(u, "", "    ")
@@ -238,6 +236,7 @@ func BuildConfig(forgitPath string) {
 
 		fileNotExist(homeDir.HomeDir+"/.forgitConf.json", databytes)
 	}
+
 	var curldata []byte
 	// File Exists Print
 	p := fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, curldata, homeDir.HomeDir)
