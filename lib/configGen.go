@@ -203,7 +203,7 @@ func BuildConfig(forgitPath string) {
 	// })
 	// fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", databytes)
 
-	//IF config file doesn't exist. Create it
+	// If config file doesn't exist. Create it
 	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
 
 		var (
@@ -224,7 +224,7 @@ func BuildConfig(forgitPath string) {
 		// Update the path in json
 		u[0].ForgitPath = forgitPath
 		now := time.Now().UTC().Unix()
-		nowString := strconv.FormatInt(dn, 10)
+		nowString := strconv.FormatInt(now, 10)
 		u[0].UpdateTime = nowString
 
 		// git byte array from MarshalIndent
