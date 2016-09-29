@@ -149,7 +149,7 @@ func fileExist(path string, forgitPath string, _ []byte, homeDir string) []byte 
 }
 
 // Creates a config file and puts server data to it.
-func fileNotExist(path string, j []byte) {
+func fileNotExist(path string, j []byte, forgitPath string) {
 	var (
 		f     *os.File
 		err   error
@@ -162,6 +162,12 @@ func fileNotExist(path string, j []byte) {
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
+	}
+	if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
+		err = os.Mkdir(forgitPath+"Forgit/", 0700)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	// Create the file and defer close
@@ -204,14 +210,16 @@ func BuildConfig(forgitPath string) {
 	// fileNotExist(homeDir.HomeDir+"/.forgitConf2.json", databytes)
 
 	// If config file doesn't exist. Create it
-	if _, err := os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
+	if _, err = os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
 
 		var (
-			u []User
+			u         []User
+			file      []byte
+			databytes []byte
 		)
 
 		// Read the config file in home dir
-		file, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConfTest.json")
+		file, err = ioutil.ReadFile(homeDir.HomeDir + "/.forgitConfTest.json")
 		if err != nil {
 			os.Exit(1)
 		}
@@ -228,19 +236,22 @@ func BuildConfig(forgitPath string) {
 		u[0].UpdateTime = nowString
 
 		// git byte array from MarshalIndent
-		databytes, err := json.MarshalIndent(u, "", "    ")
+		databytes, err = json.MarshalIndent(u, "", "    ")
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 
-		fileNotExist(homeDir.HomeDir+"/.forgitConf.json", databytes)
+		fileNotExist(homeDir.HomeDir+"/.forgitConf.json", databytes, forgitPath)
+	}
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	var curldata []byte
 	// File Exists Print
 	p := fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, curldata, homeDir.HomeDir)
-	fmt.Println("Your Config already exists in --> " + homeDir.HomeDir + "/.forgitConf.json")
+	fmt.Println("Your Config is in --> " + homeDir.HomeDir + "/.forgitConf.json")
 	fmt.Println(string(p))
 
 }

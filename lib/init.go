@@ -4,11 +4,22 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func isPath(p string) bool {
-	switch string(p[0]) {
-	case "/":
+	// Get stat on the path
+	isDirStat, err := os.Stat(p)
+	if err != nil {
+		fmt.Println("Path is not valid! Try again.")
+		return false
+	}
+
+	switch {
+	case strings.Contains(p, "Forgit") || strings.Contains(p, "forgit"):
+		return false
+	case string(p[0]) == "/" && string(p[len(p)-1:]) == "/" && isDirStat.IsDir() && string(p) != "/dev/null":
+		fmt.Println(p)
 		return true
 	}
 	return false
@@ -27,19 +38,18 @@ func Init() {
 	}
 	scanner = bufio.NewScanner(os.Stdin)
 	fmt.Println("<> Your Current Absolute Path is ->", currentDir)
-	fmt.Println("<>")
-	fmt.Print("<> Enter Absolute Path to your Forgit Directory: ")
+	fmt.Println("<> Path cannot contain Forgit name.")
+	fmt.Print("<> Enter Absolute path where you want the Forgit directory: ")
 	scanner.Scan()
 	path = scanner.Text()
 
 	valid := isPath(path)
 	if !valid {
-		fmt.Println("[]")
-		fmt.Println("[]")
+		fmt.Println()
 		fmt.Println("[] NOT VALID PATH. Absolute Path ONLY")
-		fmt.Println("** Example: /Users/CURRENT-USER/Desktop/Forgit/")
+		fmt.Println("** Example: /Users/CURRENT-USER/Desktop/")
 		fmt.Println("[]")
-		fmt.Println("[] Suggest going to the Forgit Directory and running pwd command to get its path.")
+		fmt.Println("[] Suggest going to the directory and running pwd command to get its path.")
 		fmt.Println("   [ or ]")
 		fmt.Println("[] Try Again --> fgt init")
 		return
