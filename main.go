@@ -24,8 +24,8 @@ sssosso ossosss
 `
 
 	app := cli.NewApp()
-	app.Name = "Forgit CLI"
-	app.Usage = "Never Forget To Commit"
+	app.Name = "fgt"
+	app.Usage = "fgt"
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
 		fmt.Println(logo)
@@ -39,7 +39,10 @@ sssosso ossosss
 
 	app.Commands = []cli.Command{
 		{
-			Name: "init",
+			Name:        "init",
+			Aliases:     []string{"i"},
+			Usage:       "fgt init",
+			Description: "Creates the config file in your home directory that the app uses.",
 			Action: func(c *cli.Context) error {
 				lib.Init()
 				return nil
@@ -47,13 +50,21 @@ sssosso ossosss
 		},
 		{
 			Name:        "start",
-			Aliases:     []string{"st"},
-			Usage:       "Start Forgit",
+			Aliases:     []string{"s"},
+			Usage:       "fgt start",
 			Description: "Starts app and automates based on you forgit settings.",
 			ArgsUsage:   "NUMBER-MINUTES",
-			Action: func(c *cli.Context) error {
-				fmt.Println("fgt start is Coming Soon")
-				return nil
+			Subcommands: []cli.Command{
+				{
+					Name:        "group",
+					Aliases:     []string{"g"},
+					Usage:       "fgt start group GROUP-NAME",
+					Description: "Set Workspace setting group",
+					Action: func(c *cli.Context) error {
+						lib.Start(c)
+						return nil
+					},
+				},
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -63,17 +74,22 @@ sssosso ossosss
 				},
 				cli.StringFlag{
 					Name:  "push, p",
-					Value: "5",
-					Usage: "--> Set Push repeat time *minutes |",
+					Value: "60",
+					Usage: "--> Set push repeat time MINUTES   |",
 				},
+			},
+			Action: func(c *cli.Context) error {
+				fmt.Println("To select a Workspace")
+				fmt.Println("fgt start group GROUP-NAME", "--> That will select one of your settings groups")
+				lib.Start(c)
+				return nil
 			},
 		},
 		{
-			Name:    "stop",
+			Name:    "sp",
 			Aliases: []string{"sp"},
 			Usage:   "Stop Forgit",
 			Action: func(c *cli.Context) error {
-				// fmt.Println("completed task: ", c.Args().First())
 				fmt.Println("fgt stop is Coming Soon")
 				return nil
 			},
