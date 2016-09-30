@@ -3,6 +3,7 @@ package lib
 // User ..
 type User struct {
 	GithubID   int       `json:"githubID"`
+	ForgitID   string    `json:"forgitID"`
 	ForgitPath string    `json:"forgitPath"`
 	UpdateTime string    `json:"updateTime"`
 	Settings   []Setting `json:"settings,omitempty"`
