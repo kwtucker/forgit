@@ -63,7 +63,7 @@ func Start(c *cli.Context) {
 	// Internet Check
 	internetConnection := InternetCheck()
 
-	// Check if .forgitConf.json exists
+	// get Home directory path
 	homeDir, err := osuser.Current()
 	if err != nil {
 		fmt.Println(err)
@@ -85,16 +85,14 @@ func Start(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	// data from api
+	// data from configfile
 	json.Unmarshal(configfile, &dataUser)
 
 	fmt.Println("This session will have the following settings:")
 
 	// If group exists grab group name and set the values
 	if c.Args().First() != "" {
-		fmt.Println("  - Group:", c.Args().First())
 		group = c.Args().First()
-
 		settingObj, setExist = settingGroupsCheck(group, dataUser[0])
 		if setExist == false {
 			fmt.Println()
@@ -104,13 +102,11 @@ func Start(c *cli.Context) {
 			return
 		}
 	} else {
-		fmt.Println("  - Group Not Set")
 		group = "-1"
 	}
 
 	// if commit set value
 	if c.IsSet("commit") && c.Int("commit") != 0 && group == "-1" {
-		fmt.Println("  - Commit:", c.Int("commit"))
 		commit = c.Int("commit")
 	} else {
 		commit = -1
@@ -118,18 +114,13 @@ func Start(c *cli.Context) {
 
 	// if push set value
 	if c.IsSet("push") && c.Int("push") != 0 && group == "-1" {
-		fmt.Println("  - Push:", c.Int("push"))
 		push = c.Int("push")
 	} else {
 		push = -1
 	}
 
-	fmt.Println(" commit ", commit)
-	fmt.Println(" push ", push)
-	fmt.Println(" group ", group)
-
 	// Call to API
-
+	// Curforgit(dataUser[0].GithubID, dataUser[0].ForgitID)
 	/*
 	   Check update times
 	     - Local vs API
@@ -222,6 +213,7 @@ func Start(c *cli.Context) {
 	// fmt.Println(string(configDataBytes))
 	fmt.Println("settingObj Name ->", settingObj.Name)
 	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit["TimeMin"])
+	fmt.Println("settingObj push time ->", settingObj.SettingPush["TimeMin"])
 	fmt.Println("settingObj repo index 0 name ->", settingObj.Repos)
 	fmt.Println("internetConnection ->", internetConnection)
 	// Grab all repo names from config with status 1
