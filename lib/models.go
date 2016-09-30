@@ -41,7 +41,7 @@ type SettingPush struct {
 
 // SettingRepo ...
 type SettingRepo struct {
-	GithubRepoID *int    `json:"github_repo_id"`
-	Name         *string `json:"name"`
-	Status       int     `json:"status"`
+	GithubRepoID int    `json:"github_repo_id"`
+	Name         string `json:"name"`
+	Status       int    `json:"status"`
 }
