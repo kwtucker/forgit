@@ -1,9 +1,22 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/urfave/cli"
+	"io/ioutil"
+	"os"
+	osuser "os/user"
 )
+
+func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
+	for u := range dataUser.Settings {
+		if dataUser.Settings[u].Name == groupName {
+			return dataUser.Settings[u], true
+		}
+	}
+	return dataUser.Settings[0], false
+}
 
 // Start ...
 func Start(c *cli.Context) {
@@ -11,7 +24,31 @@ func Start(c *cli.Context) {
 	var (
 		commit, push int
 		group        string
+		dataUser     []User
 	)
+	// Check if .forgitConf.json exists
+	homeDir, err := osuser.Current()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if _, err = os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
+		fmt.Println()
+		fmt.Println("* Haven't started yet!")
+		fmt.Println("* Please first run --> fgt init ")
+		fmt.Println()
+		return
+	}
+
+	// Read .forgitConf.json file
+	configfile, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConf.json")
+	if err != nil {
+		os.Exit(1)
+	}
+
+	// data from api
+	json.Unmarshal(configfile, &dataUser)
 
 	fmt.Println("This session will have the following settings:")
 
@@ -42,8 +79,19 @@ func Start(c *cli.Context) {
 		fmt.Println("  - Group:", c.Args().First())
 		group = c.Args().First()
 		// settings set on
+
+		settingObj, setExist := settingGroupsCheck(group, dataUser[0])
+		if !setExist {
+			fmt.Println()
+			fmt.Println("* Did Not Start!")
+			fmt.Println("* Setting Workspace group does not exist.")
+			fmt.Println()
+			return
+		}
+		// set group vars
 		commit = 2
 		push = 2
+
 	} else {
 		fmt.Println("  - Group Not Set")
 		group = "-1"
@@ -60,9 +108,15 @@ func Start(c *cli.Context) {
 	     - Local vs API
 	*/
 
-	// Check if .forgitConf.json exists
+	// git byte array from MarshalIndent
+	configDataBytes, err := json.MarshalIndent(dataUser, "", "    ")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
-	// Read .forgitConf.json file
+	fmt.Println(dataUser[0].GithubID)
+	fmt.Println(string(configDataBytes))
 
 	// Grab all repo names from config with status 1
 
