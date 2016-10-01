@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	osuser "os/user"
+	"sync"
+	"time"
 )
 
 func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
@@ -121,6 +123,7 @@ func Start(c *cli.Context) {
 
 	// Call to API
 	// Curforgit(dataUser[0].GithubID, dataUser[0].ForgitID)
+
 	/*
 	   Check update times
 	     - Local vs API
@@ -154,30 +157,31 @@ func Start(c *cli.Context) {
 	// This only lasts per session
 	if settingObj.Name == "" {
 		var (
-			setPush, setCommit map[string]int
+			setPush   SettingPush
+			setCommit SettingAddPullCommit
 		)
 
 		if push != -1 {
-			setPush = map[string]int{
-				"Status":  1,
-				"TimeMin": push,
+			setPush = SettingPush{
+				Status:  1,
+				TimeMin: push,
 			}
 		} else {
-			setPush = map[string]int{
-				"Status":  0,
-				"TimeMin": push,
+			setPush = SettingPush{
+				Status:  0,
+				TimeMin: push,
 			}
 		}
 
 		if commit != -1 {
-			setCommit = map[string]int{
-				"Status":  1,
-				"TimeMin": commit,
+			setCommit = SettingAddPullCommit{
+				Status:  1,
+				TimeMin: commit,
 			}
 		} else {
-			setCommit = map[string]int{
-				"Status":  0,
-				"TimeMin": commit,
+			setCommit = SettingAddPullCommit{
+				Status:  0,
+				TimeMin: commit,
 			}
 		}
 
@@ -197,11 +201,11 @@ func Start(c *cli.Context) {
 			SettingID: 0,
 			Name:      "fgtDefault",
 			Status:    1,
-			SettingNotifications: map[string]int{
-				"Status":   1,
-				"OnError":  1,
-				"OnCommit": 1,
-				"OnPush":   1,
+			SettingNotifications: SettingNotifications{
+				Status:   1,
+				OnError:  1,
+				OnCommit: 1,
+				OnPush:   1,
 			},
 			SettingAddPullCommit: setCommit,
 			SettingPush:          setPush,
@@ -212,13 +216,12 @@ func Start(c *cli.Context) {
 	fmt.Println("dataUser ID ->", dataUser[0].GithubID)
 	// fmt.Println(string(configDataBytes))
 	fmt.Println("settingObj Name ->", settingObj.Name)
-	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit["TimeMin"])
-	fmt.Println("settingObj push time ->", settingObj.SettingPush["TimeMin"])
+	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit.TimeMin)
+	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)
 	fmt.Println("settingObj repo index 0 name ->", settingObj.Repos)
 	fmt.Println("internetConnection ->", internetConnection)
-	// Grab all repo names from config with status 1
 
-	// Set Forgit path
+	// Grab all repo names from config with status 1
 
 	// Check if Forgit path is valid
 
@@ -230,4 +233,39 @@ func Start(c *cli.Context) {
 	   - file read status files into map
 	*/
 
+	// Counts the process I need to have
+	var wgCount = 0
+	if settingObj.SettingPush.Status == 1 {
+		wgCount++
+	}
+	if settingObj.SettingAddPullCommit.Status == 1 {
+		wgCount++
+	}
+
+	var wg sync.WaitGroup
+
+	// How many goroutines to wait on
+	wg.Add(wgCount)
+
+	// Make a goroutine if commit is true
+	if settingObj.SettingAddPullCommit.Status == 1 {
+		// Read, Pull, Add, Commit func
+		go func() {
+			defer wg.Done()
+			time.Sleep(time.Second * time.Duration(settingObj.SettingAddPullCommit.TimeMin))
+		}()
+
+	}
+
+	// Make a goroutine if push is true
+	if settingObj.SettingPush.Status == 1 {
+		// pull push
+		go func() {
+			defer wg.Done()
+			time.Sleep(time.Second * time.Duration(settingObj.SettingPush.TimeMin))
+		}()
+	}
+
+	// This will make the program stay alive until go routines are done
+	wg.Wait()
 }
