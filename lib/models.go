@@ -10,14 +10,25 @@ type User struct {
 }
 
 // Setting ...
+// type Setting struct {
+// 	SettingID            int            `json:"setting_id"`
+// 	Name                 string         `json:"name"`
+// 	Status               int            `json:"status"`
+// 	SettingNotifications map[string]int `json:"notifications"`
+// 	SettingAddPullCommit map[string]int `json:"addPullCommit"`
+// 	SettingPush          map[string]int `json:"push"`
+// 	Repos                []SettingRepo  `json:"repos"`
+// }
+
+// Setting ...
 type Setting struct {
-	SettingID            int            `json:"setting_id"`
-	Name                 string         `json:"name"`
-	Status               int            `json:"status"`
-	SettingNotifications map[string]int `json:"notifications"`
-	SettingAddPullCommit map[string]int `json:"addPullCommit"`
-	SettingPush          map[string]int `json:"push"`
-	Repos                []SettingRepo  `json:"repos"`
+	SettingID            int    `json:"setting_id"`
+	Name                 string `json:"name"`
+	Status               int    `json:"status"`
+	SettingNotifications `json:"notifications"`
+	SettingAddPullCommit `json:"addPullCommit"`
+	SettingPush          `json:"push"`
+	Repos                []SettingRepo `json:"repos"`
 }
 
 // SettingNotifications ...
