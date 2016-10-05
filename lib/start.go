@@ -24,14 +24,23 @@ func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
 // ForgitDirReposNames ...
 func ForgitDirReposNames(path string) []string {
 	var forgitDirReposNameSlice []string
-	files, err := ioutil.ReadDir(path)
+	// read forgit directory
+	repos, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, file := range files {
-		if file.IsDir() {
-			forgitDirReposNameSlice = append(forgitDirReposNameSlice, file.Name())
+	for _, repo := range repos {
+		if repo.IsDir() {
+			files, err := ioutil.ReadDir(path + repo.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, f := range files {
+				if f.Name() == ".git" {
+					forgitDirReposNameSlice = append(forgitDirReposNameSlice, repo.Name())
+				}
+			}
 		}
 	}
 	return forgitDirReposNameSlice
@@ -251,14 +260,16 @@ func Start(c *cli.Context) {
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.Status == 1 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
-			go GitStatus(dataUser[0].ForgitPath, settingObj.SettingAddPullCommit.TimeMin)
+			wgCount++
+			go GitStatus(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos)
 		}
 	}
 
 	//Make a goroutine if push is true
 	if settingObj.SettingPush.Status == 1 {
 		if settingObj.SettingPush.TimeMin >= 1 {
-			go GitPush(settingObj.SettingPush.TimeMin)
+			wgCount++
+			go GitPush(settingObj.SettingPush.TimeMin, settingObj.Repos)
 		}
 	}
 
