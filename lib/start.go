@@ -10,7 +10,6 @@ import (
 	"os"
 	osuser "os/user"
 	"sync"
-	"time"
 )
 
 func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
@@ -233,37 +232,34 @@ func Start(c *cli.Context) {
 	   - file read status files into map
 	*/
 
-	// Counts the process I need to have
-	var wgCount = 0
-	if settingObj.SettingPush.Status == 1 {
-		wgCount++
-	}
-	if settingObj.SettingAddPullCommit.Status == 1 {
+	var (
+		wgCount int // Counts the process I need to have
+		wg      sync.WaitGroup
+	)
+
+	if settingObj.SettingAddPullCommit.Status == 1 && settingObj.SettingAddPullCommit.Status >= 1 {
 		wgCount++
 	}
 
-	var wg sync.WaitGroup
+	if settingObj.SettingPush.Status == 1 && settingObj.SettingPush.TimeMin >= 1 {
+		wgCount++
+	}
 
 	// How many goroutines to wait on
 	wg.Add(wgCount)
 
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.Status == 1 {
-		// Read, Pull, Add, Commit func
-		go func() {
-			defer wg.Done()
-			time.Sleep(time.Second * time.Duration(settingObj.SettingAddPullCommit.TimeMin))
-		}()
-
+		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
+			go GitStatus(dataUser[0].ForgitPath, settingObj.SettingAddPullCommit.TimeMin)
+		}
 	}
 
-	// Make a goroutine if push is true
+	//Make a goroutine if push is true
 	if settingObj.SettingPush.Status == 1 {
-		// pull push
-		go func() {
-			defer wg.Done()
-			time.Sleep(time.Second * time.Duration(settingObj.SettingPush.TimeMin))
-		}()
+		if settingObj.SettingPush.TimeMin >= 1 {
+			go GitPush(settingObj.SettingPush.TimeMin)
+		}
 	}
 
 	// This will make the program stay alive until go routines are done
