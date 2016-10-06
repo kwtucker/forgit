@@ -261,7 +261,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingAddPullCommit.Status == 1 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
 			wgCount++
-			go GitStatus(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos)
+			go CommandController(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "commit")
 		}
 	}
 
@@ -269,7 +269,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingPush.Status == 1 {
 		if settingObj.SettingPush.TimeMin >= 1 {
 			wgCount++
-			go GitPush(settingObj.SettingPush.TimeMin, settingObj.Repos)
+			go CommandController(settingObj.SettingPush.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "push")
 		}
 	}
 
