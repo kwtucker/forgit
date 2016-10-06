@@ -19,11 +19,12 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 		ww     sync.WaitGroup
 	)
 
+	// grab remote
 	remote, err = getRemote(p)
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(remote)
+	// count of WaitGroup
 	ww.Add(1)
 	switch command {
 	case "push":
@@ -34,11 +35,15 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 			fmt.Println("git push "+remote, branch)
 		}()
 	case "pull":
-		fmt.Println("pull it")
+		go func() {
+			defer ww.Done()
+			// args = []string{"pull", remote, branch}
+			// cmd = exec.Command("git", args...)
+			fmt.Println("pull it")
+		}()
 	}
 	ww.Wait()
 	wg.Done()
-
 }
 
 func getRemote(path string) (string, error) {
