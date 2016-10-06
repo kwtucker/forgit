@@ -6,15 +6,17 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 //GitPushPull is simply a git push command
-func GitPushPull(p, branch, command string) {
+func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 	var (
 		err error
 		// args   []string
 		// cmd    *exec.Cmd
 		remote string
+		ww     sync.WaitGroup
 	)
 
 	remote, err = getRemote(p)
@@ -22,15 +24,20 @@ func GitPushPull(p, branch, command string) {
 		log.Println(err)
 	}
 	fmt.Println(remote)
-
+	ww.Add(1)
 	switch command {
 	case "push":
-		// args = []string{"push", remote, branch}
-		// cmd = exec.Command("git", args...)
-		fmt.Println("push it")
+		go func() {
+			defer ww.Done()
+			// args = []string{"push", remote, branch}
+			// cmd = exec.Command("git", args...)
+			fmt.Println("git push "+remote, branch)
+		}()
 	case "pull":
 		fmt.Println("pull it")
 	}
+	ww.Wait()
+	wg.Done()
 
 }
 
