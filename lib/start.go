@@ -241,26 +241,11 @@ func Start(c *cli.Context) {
 	   - file read status files into map
 	*/
 
-	var (
-		wgCount int // Counts the process I need to have
-		wg      sync.WaitGroup
-	)
-
-	if settingObj.SettingAddPullCommit.Status == 1 && settingObj.SettingAddPullCommit.Status >= 1 {
-		wgCount++
-	}
-
-	if settingObj.SettingPush.Status == 1 && settingObj.SettingPush.TimeMin >= 1 {
-		wgCount++
-	}
-
-	// How many goroutines to wait on
-	wg.Add(wgCount)
-
+	var wg sync.WaitGroup
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.Status == 1 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
-			wgCount++
+			wg.Add(1)
 			go CommandController(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "commit")
 		}
 	}
@@ -268,11 +253,10 @@ func Start(c *cli.Context) {
 	//Make a goroutine if push is true
 	if settingObj.SettingPush.Status == 1 {
 		if settingObj.SettingPush.TimeMin >= 1 {
-			wgCount++
+			wg.Add(1)
 			go CommandController(settingObj.SettingPush.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "push")
 		}
 	}
-
 	// This will make the program stay alive until go routines are done
 	wg.Wait()
 }
