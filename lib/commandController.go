@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 )
 
-//GitPush is simply a git push command
+//CommandController dispatches the commands
 func CommandController(time int, path string, repos []SettingRepo, gitCommand string) {
 
 	for {
@@ -20,21 +21,22 @@ func CommandController(time int, path string, repos []SettingRepo, gitCommand st
 			if err != nil {
 				log.Println(err)
 			}
-			fmt.Println(branchName)
 
-			status, err := Status(path + repos[r].Name)
+			_, err = Status(path + repos[r].Name)
 			if err != nil {
 				log.Println(err)
 			}
-			fmt.Println(status)
+			var wg sync.WaitGroup
+			wg.Add(1)
 
 			switch gitCommand {
 			case "commit":
 				fmt.Println("commit")
 			case "push":
 				fmt.Println("push")
+				go GitPushPull(path+repos[r].Name, branchName, "push", &wg)
 			}
-
+			wg.Wait()
 		}
 	}
 
