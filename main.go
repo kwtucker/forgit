@@ -25,6 +25,7 @@ sssosso ossosss
 
 	app := cli.NewApp()
 	app.Name = "fgt"
+	app.Author = "Kevin Tucker"
 	app.Usage = "fgt"
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
@@ -86,11 +87,11 @@ sssosso ossosss
 			},
 		},
 		{
-			Name:    "sp",
+			Name:    "stop",
 			Aliases: []string{"sp"},
-			Usage:   "Stop Forgit",
+			Usage:   "To stop the app you must do ONE of the following: \n\t\t1. Close the fgt shell window.\n\t\t2. Control-c in the fgt window.",
 			Action: func(c *cli.Context) error {
-				fmt.Println("fgt stop is Coming Soon")
+				fmt.Println("To stop the app you must do ONE of the following: \n\t1. Close the fgt shell window.\n\t2. Control-c in the fgt window.")
 				return nil
 			},
 		},
