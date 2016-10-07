@@ -2,8 +2,10 @@ package lib
 
 import (
 	"fmt"
+	"github.com/kwtucker/fileReader"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -41,8 +43,13 @@ func CommandController(gtime int, path string, repos []SettingRepo, gitCommand s
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
 				time.Sleep(2 * time.Second)
 				for _, s := range status {
-					wg.Add(1)
+					// reads the file it is currently on
+					dataSlice := fileReader.ReadFile(path + repos[r].Name + "/" + s)
+					formatSlice := strings.Join(dataSlice, "\n-")
+					wg.Add(2)
 					go GitAdd(s, &wg)
+					time.Sleep(500 * time.Millisecond)
+					go GitCommit(formatSlice, &wg)
 				}
 				fmt.Println("commit")
 			case "push":
