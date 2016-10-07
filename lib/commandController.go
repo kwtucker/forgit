@@ -41,9 +41,9 @@ func CommandController(gtime int, path string, repos []SettingRepo, gitCommand s
 			case "commit":
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
-				time.Sleep(2 * time.Second)
+				time.Sleep(4 * time.Second)
 				for _, s := range status {
-					// reads the file it is currently on
+					// reads the file it is currently on. Takes 15 seconds
 					dataSlice := fileReader.ReadFile(path + repos[r].Name + "/" + s)
 					formatSlice := strings.Join(dataSlice, "\n-")
 					wg.Add(2)

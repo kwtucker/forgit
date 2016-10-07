@@ -12,9 +12,9 @@ import (
 //GitPushPull is simply a git push command
 func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 	var (
-		err error
-		// args   []string
-		// cmd    *exec.Cmd
+		err    error
+		args   []string
+		cmd    *exec.Cmd
 		remote string
 		ww     sync.WaitGroup
 	)
@@ -30,15 +30,17 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 	case "push":
 		go func() {
 			defer ww.Done()
-			// args = []string{"push", remote, branch}
-			// cmd = exec.Command("git", args...)
+			args = []string{"push", remote, branch}
+			cmd = exec.Command("git", args...)
+			cmd.Run()
 			fmt.Println("git push "+remote, branch)
 		}()
 	case "pull":
 		go func() {
 			defer ww.Done()
-			// args = []string{"pull", remote, branch}
-			// cmd = exec.Command("git", args...)
+			args = []string{"pull", remote, branch}
+			cmd = exec.Command("git", args...)
+			cmd.Run()
 			fmt.Println("pull it")
 		}()
 	}
