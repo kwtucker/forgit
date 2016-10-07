@@ -10,28 +10,25 @@ import (
 func main() {
 	logo :=
 		`
-    '.:/:.'
-    ooo+ooo
-    ossssso
-  '.'-/o/-'.'
-//+++/- -/+++//
-sssosso ossosss
-/sssso: :ossss/
-  .-'.:/:.'-.
-    oo+++oo
-    ossssso
-    ':+s+:'
+   ______                  _  _
+   |  ___|                (_)| |
+   | |_  ___   _ __  __ _  _ | |_
+   |  _|/ _ \ |  __|/ _  || || __|
+   | | | (_) || |  | (_| || || |_
+   \_|  \___/ |_|   \__, ||_| \__|
+                     __/ |
+                    |___/
 `
 
 	app := cli.NewApp()
 	app.Name = "fgt"
-	app.Author = "Kevin Tucker"
+	app.Author = "Kevin Tucker\n\t https://github.com/kwtucker"
 	app.Usage = "fgt"
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
 		fmt.Println(logo)
 
-		fmt.Println("\tWelcome to Forgit CLI 🍺")
+		fmt.Println("\tWelcome to Forgit CLI")
 		fmt.Println("\t  Let's GIT to it!")
 		fmt.Println("     > fgt help [-h, h, --help]")
 		fmt.Println()
