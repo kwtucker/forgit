@@ -19,7 +19,7 @@ func isPath(p string) bool {
 	case strings.Contains(p, "Forgit") || strings.Contains(p, "forgit"):
 		return false
 	case string(p[0]) == "/" && string(p[len(p)-1:]) == "/" && isDirStat.IsDir() && string(p) != "/dev/null":
-		fmt.Println(p)
+		// fmt.Println(p)
 		return true
 	}
 	return false

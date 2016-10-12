@@ -1,5 +1,16 @@
 package lib
 
+// APIError ...
+type APIError struct {
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
+//UpdateStatus ...
+type UpdateStatus struct {
+	Update string `json:"update"`
+}
+
 // User ..
 type User struct {
 	GithubID   int       `json:"githubID"`
@@ -10,19 +21,7 @@ type User struct {
 }
 
 // Setting ...
-// type Setting struct {
-// 	SettingID            int            `json:"setting_id"`
-// 	Name                 string         `json:"name"`
-// 	Status               int            `json:"status"`
-// 	SettingNotifications map[string]int `json:"notifications"`
-// 	SettingAddPullCommit map[string]int `json:"addPullCommit"`
-// 	SettingPush          map[string]int `json:"push"`
-// 	Repos                []SettingRepo  `json:"repos"`
-// }
-
-// Setting ...
 type Setting struct {
-	// SettingID            int    `json:"setting_id"`
 	Name                 string `json:"name"`
 	Status               int    `json:"status"`
 	SettingNotifications `json:"notifications"`
@@ -33,7 +32,6 @@ type Setting struct {
 
 // SettingNotifications ...
 type SettingNotifications struct {
-	// Status   int `json:"status"`
 	OnError  int `json:"onError"`
 	OnCommit int `json:"onCommit"`
 	OnPush   int `json:"onPush"`
@@ -41,13 +39,11 @@ type SettingNotifications struct {
 
 // SettingAddPullCommit ...
 type SettingAddPullCommit struct {
-	// Status  int `json:"status"`
 	TimeMin int `json:"timeMinute"`
 }
 
 // SettingPush ...
 type SettingPush struct {
-	// Status  int `json:"status"`
 	TimeMin int `json:"timeMinute"`
 }
 
