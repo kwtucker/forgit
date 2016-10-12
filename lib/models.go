@@ -22,7 +22,7 @@ type User struct {
 
 // Setting ...
 type Setting struct {
-	SettingID            int    `json:"setting_id"`
+	// SettingID            int    `json:"setting_id"`
 	Name                 string `json:"name"`
 	Status               int    `json:"status"`
 	SettingNotifications `json:"notifications"`
@@ -33,7 +33,7 @@ type Setting struct {
 
 // SettingNotifications ...
 type SettingNotifications struct {
-	Status   int `json:"status"`
+	// Status   int `json:"status"`
 	OnError  int `json:"onError"`
 	OnCommit int `json:"onCommit"`
 	OnPush   int `json:"onPush"`
@@ -41,13 +41,13 @@ type SettingNotifications struct {
 
 // SettingAddPullCommit ...
 type SettingAddPullCommit struct {
-	Status  int `json:"status"`
+	// Status  int `json:"status"`
 	TimeMin int `json:"timeMinute"`
 }
 
 // SettingPush ...
 type SettingPush struct {
-	Status  int `json:"status"`
+	// Status  int `json:"status"`
 	TimeMin int `json:"timeMinute"`
 }
 

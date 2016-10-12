@@ -171,24 +171,20 @@ func Start(c *cli.Context) {
 
 		if push != -1 {
 			setPush = SettingPush{
-				Status:  1,
 				TimeMin: push,
 			}
 		} else {
 			setPush = SettingPush{
-				Status:  0,
 				TimeMin: push,
 			}
 		}
 
 		if commit != -1 {
 			setCommit = SettingAddPullCommit{
-				Status:  1,
 				TimeMin: commit,
 			}
 		} else {
 			setCommit = SettingAddPullCommit{
-				Status:  0,
 				TimeMin: commit,
 			}
 		}
@@ -206,11 +202,9 @@ func Start(c *cli.Context) {
 
 		// Struct build for the session setting
 		settingObj = Setting{
-			SettingID: 0,
-			Name:      "fgtDefault",
-			Status:    1,
+			Name:   "fgtDefault",
+			Status: 1,
 			SettingNotifications: SettingNotifications{
-				Status:   1,
 				OnError:  1,
 				OnCommit: 1,
 				OnPush:   1,
@@ -243,7 +237,7 @@ func Start(c *cli.Context) {
 
 	var wg sync.WaitGroup
 	// Make a goroutine if commit is true
-	if settingObj.SettingAddPullCommit.Status == 1 {
+	if settingObj.SettingAddPullCommit.TimeMin > 0 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
 			wg.Add(1)
 			go CommandController(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "commit")
@@ -251,7 +245,7 @@ func Start(c *cli.Context) {
 	}
 
 	//Make a goroutine if push is true
-	if settingObj.SettingPush.Status == 1 {
+	if settingObj.SettingPush.TimeMin > 0 {
 		if settingObj.SettingPush.TimeMin >= 1 {
 			wg.Add(1)
 			go CommandController(settingObj.SettingPush.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "push")
