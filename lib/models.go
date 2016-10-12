@@ -39,12 +39,12 @@ type SettingNotifications struct {
 
 // SettingAddPullCommit ...
 type SettingAddPullCommit struct {
-	TimeMin int `json:"timeMinute"`
+	TimeMin int `json:"timeMin"`
 }
 
 // SettingPush ...
 type SettingPush struct {
-	TimeMin int `json:"timeMinute"`
+	TimeMin int `json:"timeMin"`
 }
 
 // SettingRepo ...

@@ -59,7 +59,6 @@ func fileExist(path string, forgitPath string, homeDir string) []byte {
 	if len(curldata) > 200 {
 		// Format curl data and set it to settings array
 		err = json.Unmarshal(curldata, &setdata)
-		json.Marshal(setdata)
 		fileu[0].Settings = setdata
 		update = true
 	} else {
@@ -212,9 +211,8 @@ func BuildConfig(forgitPath string) {
 	}
 
 	// File Exists Print
-	// p := fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir)
+	fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir)
 
 	fmt.Println("\n\tYour Config is in --> " + homeDir.HomeDir + "/.forgitConf.json\n")
-	// fmt.Println(string(p))
 
 }
