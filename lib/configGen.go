@@ -12,8 +12,9 @@ import (
 	"time"
 )
 
-// Tells the user that the file exists and returns the config data
-func fileExist(path string, forgitPath string, homeDir string) []byte {
+// FileExist Tells the user that the file exists and returns the config data
+// func FileExist(path string, forgitPath string, homeDir string) []byte {
+func FileExist(path string, forgitPath string, homeDir string) {
 
 	var (
 		fileu []User
@@ -100,7 +101,7 @@ func fileExist(path string, forgitPath string, homeDir string) []byte {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		return databytes
+		// return databytes
 	}
 
 	// if fileUpdateTime.Before(dataUpdateTime) {
@@ -124,7 +125,7 @@ func fileExist(path string, forgitPath string, homeDir string) []byte {
 	// 	// -=--=-=--END TEMP -=-=-=-=-=-=-=-
 	// 	return databytes
 	// }
-	return nil
+	// return nil
 }
 
 // Creates a config file and puts server data to it.
@@ -211,7 +212,7 @@ func BuildConfig(forgitPath string) {
 	}
 
 	// File Exists Print
-	fileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir)
+	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir)
 
 	fmt.Println("\n\tYour Config is in --> " + homeDir.HomeDir + "/.forgitConf.json\n")
 

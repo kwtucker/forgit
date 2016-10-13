@@ -129,8 +129,7 @@ func Start(c *cli.Context) {
 		push = -1
 	}
 
-	// Call to API
-	// Curforgit(dataUser[0].GithubID, dataUser[0].ForgitID)
+	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir)
 
 	/*
 	   Check update times
@@ -220,27 +219,25 @@ func Start(c *cli.Context) {
 	fmt.Println("settingObj Name ->", settingObj.Name)
 	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit.TimeMin)
 	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)
-	fmt.Println("settingObj repo index 0 name ->", settingObj.Repos)
 	fmt.Println("internetConnection ->", internetConnection)
 
-	// Grab all repo names from config with status 1
-
-	// Check if Forgit path is valid
-
-	/*
-	   Go to each repos
-	   - Check if .git
-	   - git status short
-	     - to slice
-	   - file read status files into map
-	*/
+	// This will only pass in the repos that exist in the Forgit Directory and that are set to 1
+	var automateRepos []SettingRepo
+	repoArr := ForgitDirReposNames(dataUser[0].ForgitPath)
+	for r := range settingObj.Repos {
+		for s := range repoArr {
+			if settingObj.Repos[r].Name == repoArr[s] && settingObj.Repos[r].Status == 1 {
+				automateRepos = append(automateRepos, settingObj.Repos[r])
+			}
+		}
+	}
 
 	var wg sync.WaitGroup
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.TimeMin > 0 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
 			wg.Add(1)
-			go CommandController(settingObj.SettingAddPullCommit.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "commit")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, "commit")
 		}
 	}
 
@@ -248,7 +245,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingPush.TimeMin > 0 {
 		if settingObj.SettingPush.TimeMin >= 1 {
 			wg.Add(1)
-			go CommandController(settingObj.SettingPush.TimeMin, dataUser[0].ForgitPath+"Forgit/", settingObj.Repos, "push")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, "push")
 		}
 	}
 	// This will make the program stay alive until go routines are done

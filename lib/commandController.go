@@ -5,17 +5,22 @@ import (
 	"github.com/kwtucker/fileReader"
 	"log"
 	"os"
+	osuser "os/user"
 	"strings"
 	"sync"
 	"time"
 )
 
 //CommandController dispatches the commands
-func CommandController(gtime int, path string, repos []SettingRepo, gitCommand string) {
-
+func CommandController(settingObj Setting, path string, repos []SettingRepo, gitCommand string) {
+	homeDir, err := osuser.Current()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 	for {
-		// a delay in the for loop
-		Ticker(gtime)
+		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir)
+
 		// Where the push code is going
 		for r := range repos {
 			var (
@@ -39,6 +44,13 @@ func CommandController(gtime int, path string, repos []SettingRepo, gitCommand s
 
 			switch gitCommand {
 			case "commit":
+				commitTime, err := GetCurrentCPTimeMin(settingObj, "commit")
+				if err != nil {
+					log.Println(err)
+				}
+				fmt.Println(commitTime)
+				// a delay in the for loop
+				Ticker(commitTime)
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
 				time.Sleep(4 * time.Second)
@@ -53,6 +65,13 @@ func CommandController(gtime int, path string, repos []SettingRepo, gitCommand s
 				}
 				fmt.Println("commit")
 			case "push":
+				pushTime, err := GetCurrentCPTimeMin(settingObj, "push")
+				if err != nil {
+					log.Println(err)
+				}
+				fmt.Println(pushTime)
+				// a delay in the for loop
+				Ticker(pushTime)
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "push", &wg)
 			}
