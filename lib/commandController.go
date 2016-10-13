@@ -13,21 +13,23 @@ import (
 
 //CommandController dispatches the commands
 func CommandController(settingObj Setting, path string, repos []SettingRepo, gitCommand string) {
+	// Current home dir of user OS
 	homeDir, err := osuser.Current()
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
 	for {
+		// Read and update the config file
 		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir)
 
-		// Where the push code is going
 		for r := range repos {
 			var (
 				err error
 				wg  sync.WaitGroup
 			)
 
+			// Go to the current repo directory and get the current branch
 			err = os.Chdir(path + repos[r].Name)
 			branchName, err := GetCurrentBranch(path + repos[r].Name)
 			if err != nil {
