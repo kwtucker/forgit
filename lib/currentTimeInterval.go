@@ -7,10 +7,11 @@ import (
 )
 
 // GetCurrentCPTimeMin gets the current time interval for either commit or push
-func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, error) {
+func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, int, int, int, error) {
 	var (
-		fileu  []User
-		cptime int
+		fileu                         []User
+		cptime                        int
+		noteerr, notepush, notecommit int
 	)
 	// Home directory of the user machine
 	homeDir, err := osuser.Current()
@@ -23,6 +24,9 @@ func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, error) {
 	// set the time interval to the commit/push var cptime
 	for s := range fileu[0].Settings {
 		if fileu[0].Settings[s].Name == setObj.Name {
+			noteerr = fileu[0].Settings[s].OnError
+			notepush = fileu[0].Settings[s].OnPush
+			notecommit = fileu[0].Settings[s].OnCommit
 			switch gitCom {
 			case "commit":
 				// cptime = fileu[0].Settings[s].SettingAddPullCommit.TimeMin
@@ -37,5 +41,5 @@ func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, error) {
 		}
 	}
 
-	return cptime, err
+	return cptime, noteerr, notecommit, notepush, err
 }

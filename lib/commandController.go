@@ -47,7 +47,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			switch gitCommand {
 			case "commit":
-				ctime, err := GetCurrentCPTimeMin(settingObj, "commit")
+				ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
 				if err != nil {
 					log.Println(err)
 				}
@@ -59,8 +59,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				}
 
 				wg.Add(1)
-				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
+				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
 				time.Sleep(4 * time.Second)
+
 				for _, s := range status {
 					// reads the file it is currently on. Takes 15 seconds
 					dataSlice := fileReader.ReadFile(path + repos[r].Name + "/" + s)
@@ -68,10 +69,10 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					wg.Add(2)
 					go GitAdd(s, &wg)
 					time.Sleep(500 * time.Millisecond)
-					go GitCommit(formatSlice, &wg)
+					go GitCommit(formatSlice, &wg, notecommit, noteerr)
 				}
 			case "push":
-				ptime, err := GetCurrentCPTimeMin(settingObj, "push")
+				ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
 				if err != nil {
 					log.Println(err)
 				}
@@ -81,10 +82,10 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				} else {
 					Ticker(settingObj.SettingPush.TimeMin)
 				}
-				// a delay in the for loop
-				// Ticker(settingObj.SettingPush.TimeMin)
+
 				wg.Add(1)
-				go GitPushPull(path+repos[r].Name, branchName, "push", &wg)
+				go GitPushPull(path+repos[r].Name, branchName, "push", &wg, notepush, noteerr)
+				time.Sleep(4 * time.Second)
 			}
 			wg.Wait()
 		}

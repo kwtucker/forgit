@@ -97,6 +97,8 @@ func Start(c *cli.Context) {
 
 	// data from configfile
 	json.Unmarshal(configfile, &dataUser)
+	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
+	json.Unmarshal(configfile, &dataUser)
 
 	fmt.Println("This session will have the following settings:")
 
@@ -128,8 +130,6 @@ func Start(c *cli.Context) {
 	} else {
 		push = -1
 	}
-
-	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
 
 	// git byte array from MarshalIndent
 	// configDataBytes, err := json.MarshalIndent(dataUser, "", "    ")

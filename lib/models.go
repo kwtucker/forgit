@@ -6,6 +6,12 @@ type APIError struct {
 	Status  int    `json:"status"`
 }
 
+// Message ...
+type Message struct {
+	Title string
+	Body  string
+}
+
 //UpdateStatus ...
 type UpdateStatus struct {
 	Update string `json:"update"`

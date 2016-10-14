@@ -22,7 +22,6 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 		setdata  []Setting
 		update   bool
 	)
-
 	// get unix time and convert it to a string for storage
 	dn = time.Now().UTC().Unix()
 	dateNow = strconv.FormatInt(dn, 10)
@@ -52,7 +51,12 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 
 	if update {
 		// Update the path in json
-		fileu[0].ForgitPath = forgitPath
+		if reqt == "init" {
+			fileu[0].ForgitPath = forgitPath + "Forgit/"
+		} else {
+			fileu[0].ForgitPath = forgitPath
+		}
+
 		fileu[0].UpdateTime = dateNow
 
 		// git byte array from MarshalIndent

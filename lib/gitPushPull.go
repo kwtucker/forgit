@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -10,7 +9,7 @@ import (
 )
 
 //GitPushPull is simply a git push command
-func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
+func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, notifymeError int) {
 	var (
 		err    error
 		args   []string
@@ -32,16 +31,50 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup) {
 			defer ww.Done()
 			args = []string{"push", remote, branch}
 			cmd = exec.Command("git", args...)
-			cmd.Run()
-			fmt.Println("git push "+remote, branch)
+			err = cmd.Run()
+			if err != nil {
+				if notifymeError == 1 {
+					m := &Message{
+						Title: "Forgit Error Push",
+						Body:  " ",
+					}
+					Notify(*m)
+				}
+				os.Exit(1)
+			}
+			if notifyme == 1 {
+				m := &Message{
+					Title: "Push Event",
+					Body:  " ",
+				}
+				Notify(*m)
+			}
+			log.Println("git push "+remote, branch)
 		}()
 	case "pull":
 		go func() {
 			defer ww.Done()
 			args = []string{"pull", remote, branch}
 			cmd = exec.Command("git", args...)
-			cmd.Run()
-			fmt.Println("pull it")
+			err = cmd.Run()
+			if err != nil {
+				if notifymeError == 1 {
+					m := &Message{
+						Title: "Forgit Error Push",
+						Body:  " ",
+					}
+					Notify(*m)
+				}
+				os.Exit(1)
+			}
+			if notifyme == 1 {
+				m := &Message{
+					Title: "Forgit Pull Event",
+					Body:  " ",
+				}
+				Notify(*m)
+			}
+			log.Println("git pull", remote, branch)
 		}()
 	}
 	ww.Wait()
