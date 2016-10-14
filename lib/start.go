@@ -223,7 +223,14 @@ func Start(c *cli.Context) {
 	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)
 	fmt.Println("internetConnection ->", internetConnection)
 
+	// If the length of repos in the Forgit dir is 0 stop the app.
+	if len(automateRepos) == 0 {
+		log.Println("You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+		os.Exit(1)
+	}
+
 	var wg sync.WaitGroup
+
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.TimeMin > 0 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {

@@ -23,6 +23,13 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		// Read and update the config file
 		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir, uuid, "no")
 
+		// If the length of repos in the Forgit dir is 0 stop the app.
+		if len(repos) == 0 {
+			log.Println("You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+			os.Exit(1)
+		}
+
+		// Loop over the repos in the Forgit directory
 		for r := range repos {
 
 			var (
@@ -32,6 +39,11 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			// Go to the current repo directory and get the current branch
 			err = os.Chdir(path + repos[r].Name)
+			if err != nil {
+				log.Println("Repo:", repos[r].Name, "does not exist!")
+				os.Exit(1)
+			}
+
 			branchName, err := GetCurrentBranch(path + repos[r].Name)
 			if err != nil {
 				log.Println(err)
