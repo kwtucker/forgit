@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"os/exec"
 	"sync"
 )
@@ -22,7 +21,7 @@ func GitCommit(message string, wg *sync.WaitGroup, notifyme int, notifymeError i
 			Notify(*m)
 		}
 	}
-	fmt.Println(notifyme)
+
 	if notifyme == 1 {
 		m := &Message{
 			Title: "Commit",

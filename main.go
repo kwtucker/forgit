@@ -78,7 +78,7 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				fmt.Println("To select a Workspace")
-				fmt.Println("fgt start group GROUP-NAME", "--> That will select one of your settings groups")
+				fmt.Println("-->  fgt start group GROUP-NAME")
 				lib.Start(c)
 				return nil
 			},

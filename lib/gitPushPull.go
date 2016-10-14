@@ -49,7 +49,7 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 				}
 				Notify(*m)
 			}
-			log.Println("git push "+remote, branch)
+			log.Println(": git push "+remote, branch)
 		}()
 	case "pull":
 		go func() {
@@ -60,21 +60,13 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 			if err != nil {
 				if notifymeError == 1 {
 					m := &Message{
-						Title: "Forgit Error Push",
+						Title: "Forgit Error Pull",
 						Body:  " ",
 					}
 					Notify(*m)
 				}
 				os.Exit(1)
 			}
-			if notifyme == 1 {
-				m := &Message{
-					Title: "Forgit Pull Event",
-					Body:  " ",
-				}
-				Notify(*m)
-			}
-			log.Println("git pull", remote, branch)
 		}()
 	}
 	ww.Wait()

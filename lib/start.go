@@ -97,10 +97,10 @@ func Start(c *cli.Context) {
 
 	// data from configfile
 	json.Unmarshal(configfile, &dataUser)
-	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
-	json.Unmarshal(configfile, &dataUser)
+	// FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
+	// json.Unmarshal(configfile, &dataUser)
 
-	fmt.Println("This session will have the following settings:")
+	fmt.Println("\nThis session will have the following settings:")
 
 	// If group exists grab group name and set the values
 	if c.Args().First() != "" {
@@ -218,14 +218,14 @@ func Start(c *cli.Context) {
 		automateRepos = settingRepos
 	}
 
-	fmt.Println("settingObj Name ->", settingObj.Name)
-	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit.TimeMin)
-	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)
-	fmt.Println("internetConnection ->", internetConnection)
+	fmt.Println("\nSetting Name: ", settingObj.Name)
+	fmt.Println("Commit Time: ", settingObj.SettingAddPullCommit.TimeMin)
+	fmt.Println("Push Time: ", settingObj.SettingPush.TimeMin)
+	fmt.Println()
 
 	// If the length of repos in the Forgit dir is 0 stop the app.
 	if len(automateRepos) == 0 {
-		log.Println("You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+		log.Println(": You don't have any repos to automate.\nOr you don't have any selected in setting group.")
 		os.Exit(1)
 	}
 
@@ -241,7 +241,7 @@ func Start(c *cli.Context) {
 
 	//Make a goroutine if push is true
 	if settingObj.SettingPush.TimeMin > 0 {
-		if settingObj.SettingPush.TimeMin >= 1 {
+		if settingObj.SettingPush.TimeMin >= 1 && internetConnection == true {
 			wg.Add(1)
 			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, "push")
 		}
