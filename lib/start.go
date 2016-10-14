@@ -129,12 +129,7 @@ func Start(c *cli.Context) {
 		push = -1
 	}
 
-	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir)
-
-	/*
-	   Check update times
-	     - Local vs API
-	*/
+	FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
 
 	// git byte array from MarshalIndent
 	// configDataBytes, err := json.MarshalIndent(dataUser, "", "    ")
@@ -154,15 +149,29 @@ func Start(c *cli.Context) {
 	}
 
 	// Send setting repos with status 1 to a slice.
+	// for r := range settingObj.Repos {
+	// 	if settingObj.Repos[r].Status == 1 {
+	// 		settingRepos = append(settingRepos, settingObj.Repos[r])
+	// 	}
+	// }
+	// This will only pass in the repos that exist in the Forgit Directory and that are set to 1
+	var automateRepos []SettingRepo
+	repoArr := ForgitDirReposNames(dataUser[0].ForgitPath)
+
 	for r := range settingObj.Repos {
-		if settingObj.Repos[r].Status == 1 {
-			settingRepos = append(settingRepos, settingObj.Repos[r])
+		for s := range repoArr {
+			if settingObj.Repos[r].Name == repoArr[s] && settingObj.Repos[r].Status == 1 {
+
+				automateRepos = append(automateRepos, settingObj.Repos[r])
+			}
 		}
 	}
 
 	// If push or commit set and no group build a struct.
 	// This only lasts per session
+
 	if settingObj.Name == "" {
+		fmt.Println(automateRepos)
 		var (
 			setPush   SettingPush
 			setCommit SettingAddPullCommit
@@ -189,7 +198,7 @@ func Start(c *cli.Context) {
 		}
 
 		// Set all the repos in the forgit directory to status 1 on.
-		repoNames := ForgitDirReposNames(dataUser[0].ForgitPath + "/Forgit/")
+		repoNames := ForgitDirReposNames(dataUser[0].ForgitPath)
 		for r := range repoNames {
 			settingRepo = SettingRepo{
 				GithubRepoID: r,
@@ -212,32 +221,23 @@ func Start(c *cli.Context) {
 			SettingPush:          setPush,
 			Repos:                settingRepos,
 		}
+		automateRepos = settingRepos
+		// fmt.Println("h", automateRepos)
 	}
 
-	fmt.Println("dataUser ID ->", dataUser[0].GithubID)
+	// fmt.Println("dataUser ID ->", dataUser[0].GithubID)
 	// fmt.Println(string(configDataBytes))
 	fmt.Println("settingObj Name ->", settingObj.Name)
 	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit.TimeMin)
 	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)
 	fmt.Println("internetConnection ->", internetConnection)
 
-	// This will only pass in the repos that exist in the Forgit Directory and that are set to 1
-	var automateRepos []SettingRepo
-	repoArr := ForgitDirReposNames(dataUser[0].ForgitPath)
-	for r := range settingObj.Repos {
-		for s := range repoArr {
-			if settingObj.Repos[r].Name == repoArr[s] && settingObj.Repos[r].Status == 1 {
-				automateRepos = append(automateRepos, settingObj.Repos[r])
-			}
-		}
-	}
-
 	var wg sync.WaitGroup
 	// Make a goroutine if commit is true
 	if settingObj.SettingAddPullCommit.TimeMin > 0 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
 			wg.Add(1)
-			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, "commit")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, "commit")
 		}
 	}
 
@@ -245,7 +245,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingPush.TimeMin > 0 {
 		if settingObj.SettingPush.TimeMin >= 1 {
 			wg.Add(1)
-			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, "push")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, "push")
 		}
 	}
 	// This will make the program stay alive until go routines are done

@@ -19,7 +19,6 @@ func isPath(p string) bool {
 	case strings.Contains(p, "Forgit") || strings.Contains(p, "forgit"):
 		return false
 	case string(p[0]) == "/" && string(p[len(p)-1:]) == "/" && isDirStat.IsDir() && string(p) != "/dev/null":
-		// fmt.Println(p)
 		return true
 	}
 	return false
@@ -28,9 +27,9 @@ func isPath(p string) bool {
 // Init ...
 func Init() {
 	var (
-		err     error
-		scanner *bufio.Scanner
-		path    string
+		err        error
+		scanner    *bufio.Scanner
+		path, uuid string
 	)
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -55,6 +54,11 @@ func Init() {
 		return
 	}
 
+	scanner = bufio.NewScanner(os.Stdin)
+	fmt.Print("<> Enter UserId from Forgit Online Terminal Page: ")
+	scanner.Scan()
+	uuid = scanner.Text()
+
 	// build the config
-	BuildConfig(string(path))
+	BuildConfig(string(path), string(uuid))
 }

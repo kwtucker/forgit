@@ -14,8 +14,7 @@ import (
 
 // FileExist Tells the user that the file exists and returns the config data
 // func FileExist(path string, forgitPath string, homeDir string) []byte {
-func FileExist(path string, forgitPath string, homeDir string) {
-
+func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt string) {
 	var (
 		fileu []User
 		// datau    []User
@@ -42,6 +41,7 @@ func FileExist(path string, forgitPath string, homeDir string) {
 
 	existfile, err := ioutil.ReadFile(homeDir + "/.forgitConf.json")
 	if err != nil {
+		fmt.Println(".forgitConf.json Does not exist, Re-download Forgit")
 		os.Exit(1)
 	}
 	// Set to user struct for local file
@@ -51,8 +51,9 @@ func FileExist(path string, forgitPath string, homeDir string) {
 	// json.Unmarshal(testfile, &datau)
 
 	// Call Forgit API for settings array []Setting
-	gid := strconv.Itoa(fileu[0].GithubID)
-	curldata, err = Curlforgit(gid, fileu[0].ForgitID)
+	// gid := strconv.Itoa(fileu[0].GithubID)
+	// curldata, err = Curlforgit(gid, fileu[0].ForgitID)
+	curldata, err = Curlforgit(reqt, uuid)
 	if err != nil {
 		log.Println(err)
 	}
@@ -65,6 +66,7 @@ func FileExist(path string, forgitPath string, homeDir string) {
 	} else {
 		update = false
 	}
+	// time.Sleep(3 * time.Second)
 
 	// parse the string timestamp to a int64 unix
 	// fut, err := strconv.ParseInt(fileu[0].UpdateTime, 10, 64)
@@ -85,7 +87,7 @@ func FileExist(path string, forgitPath string, homeDir string) {
 	// if fileUpdateTime.After(dataUpdateTime) {
 	if update {
 		// Update the path in json
-		fileu[0].ForgitPath = forgitPath
+		fileu[0].ForgitPath = forgitPath + "Forgit/"
 		fileu[0].UpdateTime = dateNow
 
 		// git byte array from MarshalIndent
@@ -129,21 +131,33 @@ func FileExist(path string, forgitPath string, homeDir string) {
 }
 
 // Creates a config file and puts server data to it.
-func fileNotExist(path string, j []byte, forgitPath string) {
+func fileNotExist(homeDir string, j []byte, forgitPath string) {
 
 	var (
-		f     *os.File
-		err   error
-		jsonU []User
+		f   *os.File
+		err error
+		// jsonU []User
 	)
 
 	// set data to the user struct and indent format
-	json.Unmarshal(j, &jsonU)
-	filebytes, err := json.MarshalIndent(jsonU, "", "    ")
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+	// json.Unmarshal(j, &jsonU)
+	// filebytes, err := json.MarshalIndent(jsonU, "", "    ")
+	// if err != nil {
+	// 	fmt.Println(err.Error())
+	// 	os.Exit(1)
+	// }
+
+	u := User{
+		ForgitID:   "",
+		ForgitPath: "",
+		UpdateTime: "",
+		Settings:   []Setting{},
 	}
+	filebytes, err := json.MarshalIndent(u, "", "    ")
+	if err != nil {
+		log.Println(err)
+	}
+
 	if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
 		err = os.Mkdir(forgitPath+"Forgit/", 0700)
 		if err != nil {
@@ -152,7 +166,7 @@ func fileNotExist(path string, j []byte, forgitPath string) {
 	}
 
 	// Create the file and defer close
-	f, err = os.Create(path)
+	f, err = os.Create(homeDir + "/.forgitConf.json")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -166,11 +180,10 @@ func fileNotExist(path string, j []byte, forgitPath string) {
 	}
 	// save
 	f.Sync()
-	fmt.Println("created")
 }
 
 // BuildConfig ...
-func BuildConfig(forgitPath string) {
+func BuildConfig(forgitPath string, uuid string) {
 	// Get Home Directory
 	homeDir, err := osuser.Current()
 	if err != nil {
@@ -195,9 +208,9 @@ func BuildConfig(forgitPath string) {
 
 		// Set to user struct for local file
 		json.Unmarshal(file, &u)
-
 		// Update the path in json
 		u[0].ForgitPath = forgitPath
+		u[0].ForgitID = uuid
 		now := time.Now().UTC().Unix()
 		nowString := strconv.FormatInt(now, 10)
 		u[0].UpdateTime = nowString
@@ -208,11 +221,11 @@ func BuildConfig(forgitPath string) {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		fileNotExist(homeDir.HomeDir+"/.forgitConf.json", databytes, forgitPath)
+		fileNotExist(homeDir.HomeDir, databytes, forgitPath)
 	}
 
 	// File Exists Print
-	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir)
+	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir, uuid, "init")
 
 	fmt.Println("\n\tYour Config is in --> " + homeDir.HomeDir + "/.forgitConf.json\n")
 

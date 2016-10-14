@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"fmt"
 	"github.com/kwtucker/fileReader"
 	"log"
 	"os"
@@ -12,18 +11,20 @@ import (
 )
 
 //CommandController dispatches the commands
-func CommandController(settingObj Setting, path string, repos []SettingRepo, gitCommand string) {
+func CommandController(settingObj Setting, path string, repos []SettingRepo, uuid string, gitCommand string) {
 	// Current home dir of user OS
 	homeDir, err := osuser.Current()
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
+
 	for {
 		// Read and update the config file
-		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir)
+		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir, uuid, "no")
 
 		for r := range repos {
+
 			var (
 				err error
 				wg  sync.WaitGroup
@@ -46,13 +47,8 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, git
 
 			switch gitCommand {
 			case "commit":
-				commitTime, err := GetCurrentCPTimeMin(settingObj, "commit")
-				if err != nil {
-					log.Println(err)
-				}
-				fmt.Println(commitTime)
 				// a delay in the for loop
-				Ticker(commitTime)
+				Ticker(settingObj.SettingAddPullCommit.TimeMin)
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
 				time.Sleep(4 * time.Second)
@@ -65,15 +61,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, git
 					time.Sleep(500 * time.Millisecond)
 					go GitCommit(formatSlice, &wg)
 				}
-				fmt.Println("commit")
 			case "push":
-				pushTime, err := GetCurrentCPTimeMin(settingObj, "push")
-				if err != nil {
-					log.Println(err)
-				}
-				fmt.Println(pushTime)
 				// a delay in the for loop
-				Ticker(pushTime)
+				Ticker(settingObj.SettingPush.TimeMin)
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "push", &wg)
 			}

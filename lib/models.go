@@ -13,7 +13,7 @@ type UpdateStatus struct {
 
 // User ..
 type User struct {
-	GithubID   int       `json:"githubID"`
+	// GithubID   int       `json:"githubID"`
 	ForgitID   string    `json:"forgitID"`
 	ForgitPath string    `json:"forgitPath"`
 	UpdateTime string    `json:"updateTime"`
@@ -49,7 +49,7 @@ type SettingPush struct {
 
 // SettingRepo ...
 type SettingRepo struct {
-	GithubRepoID int    `json:"github_repo_id"`
+	GithubRepoID int    `json:"githubrepoid"`
 	Name         string `json:"name"`
 	Status       int    `json:"status"`
 }
