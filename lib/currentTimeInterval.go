@@ -25,9 +25,13 @@ func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, error) {
 		if fileu[0].Settings[s].Name == setObj.Name {
 			switch gitCom {
 			case "commit":
+				// cptime = fileu[0].Settings[s].SettingAddPullCommit.TimeMin
 				cptime = fileu[0].Settings[s].SettingAddPullCommit.TimeMin
+
 			case "push":
+				// cptime = fileu[0].Settings[s].SettingPush.TimeMin
 				cptime = fileu[0].Settings[s].SettingPush.TimeMin
+
 			}
 			break
 		}

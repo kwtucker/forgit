@@ -47,8 +47,17 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			switch gitCommand {
 			case "commit":
-				// a delay in the for loop
-				Ticker(settingObj.SettingAddPullCommit.TimeMin)
+				ctime, err := GetCurrentCPTimeMin(settingObj, "commit")
+				if err != nil {
+					log.Println(err)
+				}
+				if ctime != 0 {
+					// a delay in the for loop
+					Ticker(ctime)
+				} else {
+					Ticker(settingObj.SettingAddPullCommit.TimeMin)
+				}
+
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg)
 				time.Sleep(4 * time.Second)
@@ -62,8 +71,18 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					go GitCommit(formatSlice, &wg)
 				}
 			case "push":
+				ptime, err := GetCurrentCPTimeMin(settingObj, "push")
+				if err != nil {
+					log.Println(err)
+				}
+				if ptime != 0 {
+					// a delay in the for loop
+					Ticker(ptime)
+				} else {
+					Ticker(settingObj.SettingPush.TimeMin)
+				}
 				// a delay in the for loop
-				Ticker(settingObj.SettingPush.TimeMin)
+				// Ticker(settingObj.SettingPush.TimeMin)
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "push", &wg)
 			}

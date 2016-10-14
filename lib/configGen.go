@@ -52,7 +52,7 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 
 	if update {
 		// Update the path in json
-		fileu[0].ForgitPath = forgitPath + "Forgit/"
+		fileu[0].ForgitPath = forgitPath
 		fileu[0].UpdateTime = dateNow
 
 		// git byte array from MarshalIndent
