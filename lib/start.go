@@ -148,12 +148,6 @@ func Start(c *cli.Context) {
 		}
 	}
 
-	// Send setting repos with status 1 to a slice.
-	// for r := range settingObj.Repos {
-	// 	if settingObj.Repos[r].Status == 1 {
-	// 		settingRepos = append(settingRepos, settingObj.Repos[r])
-	// 	}
-	// }
 	// This will only pass in the repos that exist in the Forgit Directory and that are set to 1
 	var automateRepos []SettingRepo
 	repoArr := ForgitDirReposNames(dataUser[0].ForgitPath)
@@ -222,11 +216,8 @@ func Start(c *cli.Context) {
 			Repos:                settingRepos,
 		}
 		automateRepos = settingRepos
-		// fmt.Println("h", automateRepos)
 	}
 
-	// fmt.Println("dataUser ID ->", dataUser[0].GithubID)
-	// fmt.Println(string(configDataBytes))
 	fmt.Println("settingObj Name ->", settingObj.Name)
 	fmt.Println("settingObj commit time ->", settingObj.SettingAddPullCommit.TimeMin)
 	fmt.Println("settingObj push time ->", settingObj.SettingPush.TimeMin)

@@ -1,10 +1,9 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	// "net/http"
-	"encoding/json"
 	"log"
 	"os"
 	osuser "os/user"
@@ -16,43 +15,27 @@ import (
 // func FileExist(path string, forgitPath string, homeDir string) []byte {
 func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt string) {
 	var (
-		fileu []User
-		// datau    []User
+		fileu    []User
 		dn       int64
 		dateNow  string
 		curldata []byte
 		setdata  []Setting
-		// setErr    []APIError
-		// setUpdate []UpdateStatus
-		update bool
+		update   bool
 	)
 
 	// get unix time and convert it to a string for storage
 	dn = time.Now().UTC().Unix()
 	dateNow = strconv.FormatInt(dn, 10)
 
-	//-=-=-=-=- TEMP to get test data from file -=-=-=-=-=-=-=
-	// Read the config file in home dir
-	// testfile, err := ioutil.ReadFile(homeDir + "/.forgitConfTest.json")
-	// if err != nil {
-	// 	os.Exit(1)
-	// }
-	// -=--=-=--END TEMP -=-=-=-=-=-=-=-
-
 	existfile, err := ioutil.ReadFile(homeDir + "/.forgitConf.json")
 	if err != nil {
 		fmt.Println(".forgitConf.json Does not exist, Re-download Forgit")
 		os.Exit(1)
 	}
+
 	// Set to user struct for local file
 	json.Unmarshal(existfile, &fileu)
 
-	// data from api
-	// json.Unmarshal(testfile, &datau)
-
-	// Call Forgit API for settings array []Setting
-	// gid := strconv.Itoa(fileu[0].GithubID)
-	// curldata, err = Curlforgit(gid, fileu[0].ForgitID)
 	curldata, err = Curlforgit(reqt, uuid)
 	if err != nil {
 		log.Println(err)
@@ -66,25 +49,7 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 	} else {
 		update = false
 	}
-	// time.Sleep(3 * time.Second)
 
-	// parse the string timestamp to a int64 unix
-	// fut, err := strconv.ParseInt(fileu[0].UpdateTime, 10, 64)
-	// if err != nil {
-	// 	fmt.Println("update time format error")
-	// 	os.Exit(1)
-	// }
-
-	// dut, err := strconv.ParseInt(datau[0].UpdateTime, 10, 64)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// convert to a time.Time struct for comparing
-	// fileUpdateTime := time.Unix(fut, 0)
-	// dataUpdateTime := time.Unix(dut, 0)
-
-	// if fileUpdateTime.After(dataUpdateTime) {
 	if update {
 		// Update the path in json
 		fileu[0].ForgitPath = forgitPath + "Forgit/"
@@ -103,31 +68,7 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
-		// return databytes
 	}
-
-	// if fileUpdateTime.Before(dataUpdateTime) {
-	// 	// TODO: Need to sent post curl to api with new data and update mongodb on server
-	//
-	// 	//-=-=-=-=- TEMP to update test data from file -=-=-=-=-=-=-=
-	// 	// Update the path in json
-	// 	datau[0].ForgitPath = forgitPath
-	// 	datau[0].UpdateTime = dateNow
-	// 	// git byte array from MarshalIndent
-	// 	databytes, err := json.MarshalIndent(datau, "", "    ")
-	// 	if err != nil {
-	// 		fmt.Println(err.Error())
-	// 		os.Exit(1)
-	// 	}
-	// 	err = ioutil.WriteFile(path, databytes, 0644)
-	// 	if err != nil {
-	// 		fmt.Println(err.Error())
-	// 		os.Exit(1)
-	// 	}
-	// 	// -=--=-=--END TEMP -=-=-=-=-=-=-=-
-	// 	return databytes
-	// }
-	// return nil
 }
 
 // Creates a config file and puts server data to it.
@@ -136,16 +77,7 @@ func fileNotExist(homeDir string, j []byte, forgitPath string) {
 	var (
 		f   *os.File
 		err error
-		// jsonU []User
 	)
-
-	// set data to the user struct and indent format
-	// json.Unmarshal(j, &jsonU)
-	// filebytes, err := json.MarshalIndent(jsonU, "", "    ")
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// 	os.Exit(1)
-	// }
 
 	u := User{
 		ForgitID:   "",
