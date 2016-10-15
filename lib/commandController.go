@@ -27,31 +27,58 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			setdata  []Setting
 			repoArr  []SettingRepo
 		)
+		// Read config
 		configfile, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConf.json")
 		if err != nil {
 			os.Exit(1)
 		}
 		json.Unmarshal(configfile, &dataUser)
-
 		// Grab most recent data and set it to the datauser
 		curldata, err := Curlforgit("no", dataUser[0].ForgitID)
 		if err != nil {
 			log.Println(err)
 		}
+		var aerr APIError
+		err = json.Unmarshal(curldata, &aerr)
+		if err != nil {
+			log.Println(err)
+		}
+		// If the forgit Id is wrong
+		if aerr.Status == 401 {
+			log.Println(": bad credentials, Redownload Forgit")
+			if settingObj.OnError == 1 {
+				m := &Message{
+					Title: "User Id Wrong",
+					Body:  "User Id Wrong. Redownload Forgit",
+				}
+				Notify(*m)
+			}
+			os.Exit(1)
+		}
+
+		// if it is greater than 200 data was updated.
 		if len(curldata) > 200 {
 			// Format curl data and set it to settings array
 			err = json.Unmarshal(curldata, &setdata)
 			for set := range setdata {
 				if setdata[set].Name == settingObj.Name {
 					settingObj = setdata[set]
-					log.Println(len(settingObj.Repos))
 					for i := range settingObj.Repos {
 						if settingObj.Repos[i].Status == 1 {
 							repoArr = append(repoArr, settingObj.Repos[i])
 						}
 					}
 					if len(repoArr) == 0 {
-						log.Println(": You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+						log.Println(": You don't have any repos to automate.\n" +
+							"\tOr you don't have any selected in setting group.\n" +
+							"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
+						if settingObj.OnError == 1 {
+							m := &Message{
+								Title: "Setting Repo Error",
+								Body:  "No repos to automate",
+							}
+							Notify(*m)
+						}
 						os.Exit(1)
 					}
 					break
@@ -61,7 +88,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 		// If the length of repos in the Forgit dir is 0 stop the app.
 		if len(repos) == 0 {
-			log.Println(": You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+			log.Println(": You don't have any repos to automate.\n" +
+				"\tOr you don't have any selected in setting group.\n" +
+				"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
 			os.Exit(1)
 		}
 

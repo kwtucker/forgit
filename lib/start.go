@@ -173,7 +173,6 @@ func Start(c *cli.Context) {
 	// This only lasts per session
 
 	if settingObj.Name == "" {
-		fmt.Println(automateRepos)
 		var (
 			setPush   SettingPush
 			setCommit SettingAddPullCommit
@@ -233,7 +232,9 @@ func Start(c *cli.Context) {
 
 	// If the length of repos in the Forgit dir is 0 stop the app.
 	if len(automateRepos) == 0 {
-		log.Println(": You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+		log.Println(": You don't have any repos to automate.\n" +
+			"\tOr you don't have any selected in setting group.\n" +
+			"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
 		os.Exit(1)
 	}
 
