@@ -1,7 +1,9 @@
 package lib
 
 import (
+	"encoding/json"
 	"github.com/kwtucker/fileReader"
+	"io/ioutil"
 	"log"
 	"os"
 	osuser "os/user"
@@ -20,8 +22,42 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 	}
 
 	for {
-		// Read and update the config file
-		FileExist(homeDir.HomeDir+"/.forgitConf.json", path, homeDir.HomeDir, uuid, "no")
+		var (
+			dataUser []User
+			setdata  []Setting
+			repoArr  []SettingRepo
+		)
+		configfile, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConf.json")
+		if err != nil {
+			os.Exit(1)
+		}
+		json.Unmarshal(configfile, &dataUser)
+
+		// Grab most recent data and set it to the datauser
+		curldata, err := Curlforgit("no", dataUser[0].ForgitID)
+		if err != nil {
+			log.Println(err)
+		}
+		if len(curldata) > 200 {
+			// Format curl data and set it to settings array
+			err = json.Unmarshal(curldata, &setdata)
+			for set := range setdata {
+				if setdata[set].Name == settingObj.Name {
+					settingObj = setdata[set]
+					log.Println(len(settingObj.Repos))
+					for i := range settingObj.Repos {
+						if settingObj.Repos[i].Status == 1 {
+							repoArr = append(repoArr, settingObj.Repos[i])
+						}
+					}
+					if len(repoArr) == 0 {
+						log.Println(": You don't have any repos to automate.\nOr you don't have any selected in setting group.")
+						os.Exit(1)
+					}
+					break
+				}
+			}
+		}
 
 		// If the length of repos in the Forgit dir is 0 stop the app.
 		if len(repos) == 0 {

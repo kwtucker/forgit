@@ -90,15 +90,23 @@ func Start(c *cli.Context) {
 	}
 
 	// Read .forgitConf.json file
+	// data from configfile
 	configfile, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConf.json")
 	if err != nil {
 		os.Exit(1)
 	}
-
-	// data from configfile
 	json.Unmarshal(configfile, &dataUser)
+
+	// Grab most recent data and set it to the datauser
+	curldata, err := Curlforgit("init", dataUser[0].ForgitID)
+	if err != nil {
+		log.Println(err)
+	}
+	var setdata []Setting
+	json.Unmarshal(curldata, &setdata)
+	dataUser[0].Settings = setdata
+
 	// FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
-	// json.Unmarshal(configfile, &dataUser)
 
 	fmt.Println("\nThis session will have the following settings:")
 
