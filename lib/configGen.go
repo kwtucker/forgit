@@ -39,7 +39,6 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(string(curldata))
 
 	if len(curldata) > 200 {
 		// Format curl data and set it to settings array

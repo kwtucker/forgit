@@ -9,7 +9,9 @@ import (
 	"net/http"
 	"os"
 	osuser "os/user"
+	"strconv"
 	"sync"
+	"time"
 )
 
 func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
@@ -68,6 +70,8 @@ func Start(c *cli.Context) {
 		settingRepos []SettingRepo
 		settingRepo  SettingRepo
 		setExist     bool
+		dn           int64
+		dateNow      string
 	)
 
 	// Internet Check
@@ -105,6 +109,22 @@ func Start(c *cli.Context) {
 	var setdata []Setting
 	json.Unmarshal(curldata, &setdata)
 	dataUser[0].Settings = setdata
+
+	// update time
+	dn = time.Now().UTC().Unix()
+	dateNow = strconv.FormatInt(dn, 10)
+	dataUser[0].UpdateTime = dateNow
+
+	databytes, err := json.MarshalIndent(dataUser, "", "    ")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	err = ioutil.WriteFile(homeDir.HomeDir+"/.forgitConf.json", databytes, 0644)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
 	// FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
 

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	osuser "os/user"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -38,28 +39,48 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		if err != nil {
 			log.Println(err)
 		}
-		var aerr APIError
-		err = json.Unmarshal(curldata, &aerr)
-		if err != nil {
-			log.Println(err)
-		}
-		// If the forgit Id is wrong
-		if aerr.Status == 401 {
-			log.Println(": bad credentials, Redownload Forgit")
-			if settingObj.OnError == 1 {
-				m := &Message{
-					Title: "User Id Wrong",
-					Body:  "User Id Wrong. Redownload Forgit",
-				}
-				Notify(*m)
-			}
-			os.Exit(1)
-		}
 
+		// if it is bad creds
+		if len(curldata) == 42 {
+			var aerr APIError
+			err = json.Unmarshal(curldata, &aerr)
+			if err != nil {
+				log.Println(err)
+			}
+			// If the forgit Id is wrong
+			if aerr.Status == 401 {
+				log.Println(": bad credentials, Redownload Forgit")
+				if settingObj.OnError == 1 {
+					m := &Message{
+						Title: "User Id Wrong",
+						Body:  "User Id Wrong. Redownload Forgit",
+					}
+					Notify(*m)
+				}
+				os.Exit(1)
+			}
+		}
 		// if it is greater than 200 data was updated.
 		if len(curldata) > 200 {
 			// Format curl data and set it to settings array
 			err = json.Unmarshal(curldata, &setdata)
+			dn := time.Now().UTC().Unix()
+			dateNow := strconv.FormatInt(dn, 10)
+			dataUser[0].ForgitPath = path
+			dataUser[0].Settings = setdata
+			dataUser[0].UpdateTime = dateNow
+			databytes, err := json.MarshalIndent(dataUser, "", "    ")
+			if err != nil {
+				log.Println(err.Error())
+				os.Exit(1)
+			}
+
+			// Write to file with updated info
+			err = ioutil.WriteFile(homeDir.HomeDir+"/.forgitConf.json", databytes, 0644)
+			if err != nil {
+				log.Println(err.Error())
+				os.Exit(1)
+			}
 			for set := range setdata {
 				if setdata[set].Name == settingObj.Name {
 					settingObj = setdata[set]
@@ -68,6 +89,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 							repoArr = append(repoArr, settingObj.Repos[i])
 						}
 					}
+					// repos = repoArr
 					if len(repoArr) == 0 {
 						log.Println(": You don't have any repos to automate.\n" +
 							"\tOr you don't have any selected in setting group.\n" +
