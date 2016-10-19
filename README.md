@@ -24,40 +24,40 @@ ___
 
 #### fgt start
 This command has a few params you can pass in. In general it will start the app with the setting workspace that is already selected on the web interface.  
-   * **General**  
+  * **General**  
 
-        ```
-        $ fgt start
-        ```  
+    ```
+    $ fgt start
+    ```  
 
-        * **Output**:  
-            To select a Workspace  
-            -->  fgt start group GROUP-NAME  
-            This session will have the following settings:  
-            Setting Name:  General  
-            Commit Time:  1  
-            Push Time:  2  
+    * **Output**:  
+        To select a Workspace  
+        -->  fgt start group GROUP-NAME  
+        This session will have the following settings:  
+        Setting Name:  General  
+        Commit Time:  1  
+        Push Time:  2  
 
-            ___
+        ___
 
   *  **Offline or single session**  
     Commit time minutes param: **-c**  
     Push time minutes param: **-p**
 
-        ```
-        $ fgt start -c 5 -p 30
-        ```
+    ```
+    $ fgt start -c 5 -p 30
+    ```
 
-        * **Output**:  
-            To select a Workspace  
-            -->  fgt start group GROUP-NAME  
-            This session will have the following settings:  
-            Setting Name:  fgtDefault  
-            Commit Time:  2  
-            Push Time:  2
+    * **Output**:  
+        To select a Workspace  
+        -->  fgt start group GROUP-NAME  
+        This session will have the following settings:  
+        Setting Name:  fgtDefault  
+        Commit Time:  2  
+        Push Time:  2
 
-            ___
-            
+        ___
+
   * **Setting Workspace**  
     The workspace name has to be spelled exact or it will not work.  
     select workspace param: **g**  
@@ -77,9 +77,9 @@ ___
 #### fgt stop  
 
  * **Output**:   
- To stop the app you must do ONE of the following:  
- 1. Close the fgt shell window.  
- 2. Control-c in the fgt window.
+  To stop the app you must do ONE of the following:  
+    1. Close the fgt shell window.  
+    2. Control-c in the fgt window.
 
 ___
 
