@@ -78,8 +78,8 @@ ___
 
  * **Output**:   
   To stop the app you must do ONE of the following:  
-    1. Close the fgt shell window.  
-    2. Control-c in the fgt window.
+  1. Close the fgt shell window.  
+  2. Control-c in the fgt window.
 
 ___
 
