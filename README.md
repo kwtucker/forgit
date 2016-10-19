@@ -25,9 +25,11 @@ ___
 #### fgt start
 This command has a few params you can pass in. In general it will start the app with the setting workspace that is already selected on the web interface.  
    * **General**  
+
         ```
         $ fgt start
-        ```
+        ```  
+
         * **Output**:  
             To select a Workspace  
             -->  fgt start group GROUP-NAME  
@@ -35,13 +37,17 @@ This command has a few params you can pass in. In general it will start the app 
             Setting Name:  General  
             Commit Time:  1  
             Push Time:  2  
+
             ___
+
   *  **Offline or single session**  
     Commit time minutes param: **-c**  
     Push time minutes param: **-p**
+
         ```
         $ fgt start -c 5 -p 30
         ```
+
         * **Output**:  
             To select a Workspace  
             -->  fgt start group GROUP-NAME  
@@ -49,14 +55,16 @@ This command has a few params you can pass in. In general it will start the app 
             Setting Name:  fgtDefault  
             Commit Time:  2  
             Push Time:  2
+
             ___
+            
   * **Setting Workspace**  
     The workspace name has to be spelled exact or it will not work.  
     select workspace param: **g**  
 
     ```
     $ fgt start g General
-    ```  
+    ```
 
     * **Output**:  
         This session will have the following settings:  
@@ -69,17 +77,21 @@ ___
 #### fgt stop  
 
  * **Output**:   
-    To stop the app you must do ONE of the following:  
-	1. Close the fgt shell window.  
-	2. Control-c in the fgt window.   
+ To stop the app you must do ONE of the following:  
+ 1. Close the fgt shell window.  
+ 2. Control-c in the fgt window.
+
 ___
 
 #### fgt help
 Help will show possible commands and how to use them.  
+
 ```
 $ fgt help
 ```
+
 **Or**
+
 ```
 $ fgt h
 ```
