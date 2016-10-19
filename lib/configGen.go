@@ -52,7 +52,14 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 	if update {
 		// Update the path in json
 		if reqt == "init" {
+			if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
+				err = os.Mkdir(forgitPath+"Forgit/", 0700)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
 			fileu[0].ForgitPath = forgitPath + "Forgit/"
+			fileu[0].ForgitID = uuid
 		} else {
 			fileu[0].ForgitPath = forgitPath
 		}
@@ -76,24 +83,50 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 }
 
 // Creates a config file and puts server data to it.
-func fileNotExist(homeDir string, j []byte, forgitPath string) {
-
+// func fileNotExist(homeDir string, j []byte, forgitPath string) {
+func fileNotExist(homeDir string, uuid string, forgitPath string) {
 	var (
-		f   *os.File
-		err error
+		f    *os.File
+		err  error
+		uarr []User
 	)
 
 	u := User{
-		ForgitID:   "",
-		ForgitPath: "",
-		UpdateTime: "",
-		Settings:   []Setting{},
+		ForgitID:   uuid,
+		ForgitPath: forgitPath,
+		UpdateTime: "0",
+		Settings: []Setting{
+			Setting{
+				Name:   "General",
+				Status: 1,
+				SettingNotifications: SettingNotifications{
+					OnError:  1,
+					OnCommit: 1,
+					OnPush:   1,
+				},
+				SettingAddPullCommit: SettingAddPullCommit{
+					TimeMin: 2,
+				},
+				SettingPush: SettingPush{
+					TimeMin: 60,
+				},
+				Repos: []SettingRepo{
+					SettingRepo{
+						GithubRepoID: 0,
+						Name:         "r",
+						Status:       0,
+					},
+				},
+			},
+		},
 	}
-	filebytes, err := json.MarshalIndent(u, "", "    ")
+	uarr = append(uarr, u)
+	filebytes, err := json.MarshalIndent(uarr, "", "    ")
 	if err != nil {
 		log.Println(err)
 	}
-
+	// f, err = os.Create(homeDir + ".forgitConf.json")
+	// f.Close()
 	if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
 		err = os.Mkdir(forgitPath+"Forgit/", 0700)
 		if err != nil {
@@ -116,6 +149,8 @@ func fileNotExist(homeDir string, j []byte, forgitPath string) {
 	}
 	// save
 	f.Sync()
+
+	FileExist(homeDir+"/.forgitConf.json", forgitPath, homeDir, uuid, "init")
 }
 
 // BuildConfig ...
@@ -129,40 +164,13 @@ func BuildConfig(forgitPath string, uuid string) {
 
 	// If config file doesn't exist. Create it
 	if _, err = os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
-
-		var (
-			u         []User
-			file      []byte
-			databytes []byte
-		)
-
-		// Read the config file in home dir
-		file, err = ioutil.ReadFile(homeDir.HomeDir + "/.forgitConfTest.json")
-		if err != nil {
-			os.Exit(1)
-		}
-
-		// Set to user struct for local file
-		json.Unmarshal(file, &u)
-		// Update the path in json
-		u[0].ForgitPath = forgitPath
-		u[0].ForgitID = uuid
-		now := time.Now().UTC().Unix()
-		nowString := strconv.FormatInt(now, 10)
-		u[0].UpdateTime = nowString
-
-		// git byte array from MarshalIndent
-		databytes, err = json.MarshalIndent(u, "", "    ")
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-		fileNotExist(homeDir.HomeDir, databytes, forgitPath)
+		fileNotExist(homeDir.HomeDir, uuid, forgitPath)
 	}
 
 	// File Exists Print
 	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir, uuid, "init")
 
-	fmt.Println("\n\tYour Config is in --> " + homeDir.HomeDir + "/.forgitConf.json\n")
+	fmt.Println("\n\tYour Config Is In --> " + homeDir.HomeDir + "/.forgitConf.json\n")
+	fmt.Println("\n\tNow Run --> " + "fgt start\n")
 
 }

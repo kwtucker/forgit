@@ -4,11 +4,13 @@ import "time"
 
 // Ticker is for delaying time for future.
 func Ticker(ptime int) {
-	ticker := time.NewTicker(time.Second * time.Duration(ptime))
-	go func() {
-		for range ticker.C {
-		}
-	}()
-	time.Sleep(time.Second * time.Duration(ptime))
-	ticker.Stop()
+	if ptime > 0 {
+		ticker := time.NewTicker(time.Minute * time.Duration(ptime))
+		go func() {
+			for range ticker.C {
+			}
+		}()
+		time.Sleep(time.Minute * time.Duration(ptime))
+		ticker.Stop()
+	}
 }
