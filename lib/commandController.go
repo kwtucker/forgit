@@ -120,8 +120,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		for r := range repos {
 
 			var (
-				err error
-				wg  sync.WaitGroup
+				err       error
+				wg        sync.WaitGroup
+				dataSlice []string
 			)
 
 			// Go to the current repo directory and get the current branch
@@ -160,10 +161,17 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				wg.Add(1)
 				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
 				time.Sleep(4 * time.Second)
-
+				if settingObj.OnCommit == 1 {
+					m := &Message{
+						Title: "Save Files",
+						Body:  "Forgit Event In 15 seconds",
+					}
+					Notify(*m)
+					time.Sleep(15 * time.Second)
+				}
 				for _, s := range status {
 					// reads the file it is currently on. Takes 15 seconds
-					dataSlice := fileReader.ReadFile(path + repos[r].Name + "/" + s)
+					dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
 					formatSlice := strings.Join(dataSlice, "\n-")
 					wg.Add(2)
 					go GitAdd(s, &wg)
