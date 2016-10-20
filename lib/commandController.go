@@ -169,15 +169,22 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					Notify(*m)
 					time.Sleep(15 * time.Second)
 				}
-				for _, s := range status {
-					// reads the file it is currently on. Takes 15 seconds
-					dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
-					formatSlice := strings.Join(dataSlice, "\n-")
-					wg.Add(2)
-					go GitAdd(s, &wg)
-					time.Sleep(500 * time.Millisecond)
-					go GitCommit(formatSlice, &wg, notecommit, noteerr)
-				}
+
+				wg.Add(1)
+				go func(wgg *sync.WaitGroup) {
+					defer wgg.Done()
+					for _, s := range status {
+						// reads the file it is currently on. Takes 15 seconds
+						dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
+						formatSlice := strings.Join(dataSlice, "\n-")
+						wg.Add(2)
+						go GitAdd(s, &wg)
+						time.Sleep(500 * time.Millisecond)
+						go GitCommit(formatSlice, &wg, notecommit, noteerr)
+					}
+				}(&wg)
+
+				// time.Sleep(time.Duration(len(status)) * time.Second)
 			case "push":
 				ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
 				if err != nil {
