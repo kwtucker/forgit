@@ -59,7 +59,6 @@ func Init() {
 
 	if p == " " || p == "" {
 		path = currentDir + "/"
-		fmt.Println(path)
 	}
 
 	scanner = bufio.NewScanner(os.Stdin)
