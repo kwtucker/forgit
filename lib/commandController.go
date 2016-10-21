@@ -21,13 +21,14 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		log.Println(err)
 		os.Exit(1)
 	}
-
+	var commitCounter, pushCounter int
 	for {
 		var (
 			dataUser []User
 			setdata  []Setting
 			repoArr  []SettingRepo
 		)
+
 		// Read config
 		configfile, err := ioutil.ReadFile(homeDir.HomeDir + "/.forgitConf.json")
 		if err != nil {
@@ -116,6 +117,18 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			os.Exit(1)
 		}
 
+		// Delays the first start
+		if gitCommand == "commit" && commitCounter == 0 {
+			Ticker(settingObj.SettingAddPullCommit.TimeMin)
+			commitCounter++
+			log.Println(commitCounter)
+		}
+		if gitCommand == "push" && pushCounter == 0 {
+			Ticker(settingObj.SettingPush.TimeMin)
+			pushCounter++
+			log.Println(pushCounter)
+		}
+
 		// Loop over the repos in the Forgit directory
 		for r := range repos {
 
@@ -147,62 +160,61 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			switch gitCommand {
 			case "commit":
-				ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
-				if err != nil {
-					log.Println(err)
-				}
-				if ctime != 0 {
-					// a delay in the for loop
-					Ticker(ctime)
-				} else {
-					Ticker(settingObj.SettingAddPullCommit.TimeMin)
-				}
-
-				wg.Add(1)
-				go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
-				time.Sleep(4 * time.Second)
-				if settingObj.OnCommit == 1 {
-					m := &Message{
-						Title: "Save Files",
-						Body:  "Forgit Event In 15 seconds",
+				if commitCounter >= 1 {
+					ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
+					if err != nil {
+						log.Println(err)
 					}
-					Notify(*m)
-					time.Sleep(15 * time.Second)
-				}
 
-				wg.Add(1)
-				go func(wgg *sync.WaitGroup) {
-					defer wgg.Done()
+					wg.Add(1)
+					go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
+					// time.Sleep(4 * time.Second)
+
+					if settingObj.OnCommit == 1 {
+						m := &Message{
+							Title: "Save Files",
+							Body:  "Forgit Event In 15 seconds",
+						}
+						Notify(*m)
+						time.Sleep(15 * time.Second)
+					}
+
 					for _, s := range status {
 						// reads the file it is currently on. Takes 15 seconds
 						dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
 						formatSlice := strings.Join(dataSlice, "\n-")
 						wg.Add(2)
 						go GitAdd(s, &wg)
-						time.Sleep(500 * time.Millisecond)
+						// time.Sleep(500 * time.Millisecond)
 						go GitCommit(formatSlice, &wg, notecommit, noteerr)
 					}
-				}(&wg)
 
+					if ctime != 0 {
+						// a delay in the for loop
+						Ticker(ctime)
+					} else {
+						Ticker(settingObj.SettingAddPullCommit.TimeMin)
+					}
+				}
 				// time.Sleep(time.Duration(len(status)) * time.Second)
 			case "push":
-				ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
-				if err != nil {
-					log.Println(err)
+				if pushCounter >= 1 {
+					ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
+					if err != nil {
+						log.Println(err)
+					}
+					wg.Add(1)
+					go GitPushPull(path+repos[r].Name, branchName, "push", &wg, notepush, noteerr)
+					// time.Sleep(4 * time.Second)
+					if ptime != 0 {
+						// a delay in the for loop
+						Ticker(ptime)
+					} else {
+						Ticker(settingObj.SettingPush.TimeMin)
+					}
 				}
-				if ptime != 0 {
-					// a delay in the for loop
-					Ticker(ptime)
-				} else {
-					Ticker(settingObj.SettingPush.TimeMin)
-				}
-
-				wg.Add(1)
-				go GitPushPull(path+repos[r].Name, branchName, "push", &wg, notepush, noteerr)
-				time.Sleep(4 * time.Second)
 			}
 			wg.Wait()
 		}
 	}
-
 }

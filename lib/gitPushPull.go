@@ -40,7 +40,7 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 					}
 					Notify(*m)
 				}
-				os.Exit(1)
+				// os.Exit(1)
 			}
 			if notifyme == 1 {
 				m := &Message{
@@ -65,7 +65,7 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 					}
 					Notify(*m)
 				}
-				os.Exit(1)
+				// os.Exit(1)
 			}
 		}()
 	}
