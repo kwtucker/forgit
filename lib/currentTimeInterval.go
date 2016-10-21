@@ -41,5 +41,11 @@ func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, int, int, int, err
 		}
 	}
 
+	if setObj.Name == "fgtDefault" {
+		noteerr = 1
+		notecommit = 1
+		notepush = 1
+	}
+
 	return cptime, noteerr, notecommit, notepush, err
 }

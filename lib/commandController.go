@@ -117,16 +117,14 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			os.Exit(1)
 		}
 
-		// Delays the first start
+		// Delays the first start commit and push
 		if gitCommand == "commit" && commitCounter == 0 {
 			Ticker(settingObj.SettingAddPullCommit.TimeMin)
 			commitCounter++
-			log.Println(commitCounter)
 		}
 		if gitCommand == "push" && pushCounter == 0 {
 			Ticker(settingObj.SettingPush.TimeMin)
 			pushCounter++
-			log.Println(pushCounter)
 		}
 
 		// Loop over the repos in the Forgit directory
