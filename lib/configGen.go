@@ -26,6 +26,7 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 	dn = time.Now().UTC().Unix()
 	dateNow = strconv.FormatInt(dn, 10)
 
+	// Check if the json file is there.
 	existfile, err := ioutil.ReadFile(homeDir + "/.forgitConf.json")
 	if err != nil {
 		fmt.Println(".forgitConf.json Does not exist, Re-download Forgit")
@@ -34,14 +35,16 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 
 	// Set to user struct for local file
 	json.Unmarshal(existfile, &fileu)
+
+	// Check internet and if so get user data from forgit web.
 	isInternet := InternetCheck()
 	if isInternet {
-
 		curldata, err = Curlforgit(reqt, uuid)
 		if err != nil {
 			log.Println(err)
 		}
 
+		// If the data returned is large update the settings.
 		if len(curldata) > 200 {
 			// Format curl data and set it to settings array
 			err = json.Unmarshal(curldata, &setdata)
@@ -94,6 +97,7 @@ func fileNotExist(homeDir string, uuid string, forgitPath string) {
 		uarr []User
 	)
 
+	// Create a temp user.
 	u := User{
 		ForgitID:   uuid,
 		ForgitPath: forgitPath,
@@ -123,13 +127,15 @@ func fileNotExist(homeDir string, uuid string, forgitPath string) {
 			},
 		},
 	}
+
+	// Put user in a array and unpack the user.
 	uarr = append(uarr, u)
 	filebytes, err := json.MarshalIndent(uarr, "", "    ")
 	if err != nil {
 		log.Println(err)
 	}
-	// f, err = os.Create(homeDir + ".forgitConf.json")
-	// f.Close()
+
+	// If the Forgit directory doesn't exist make it.
 	if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
 		err = os.Mkdir(forgitPath+"Forgit/", 0700)
 		if err != nil {

@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-//Notify ..
+//Notify ...
 func Notify(msg Message) {
 	notifyTitle := msg.Title
 	notifyMessage := msg.Body
@@ -24,8 +24,4 @@ func Notify(msg Message) {
 	case "linux":
 		exec.Command("notify-send", "-i", "./logo_icon.png", notifyTitle, notifyMessage, "-u", "critical").Run()
 	}
-
-	// Delay the app from reading and writing for
-	// time.Sleep(time.Second * 15)
-
 }

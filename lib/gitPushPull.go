@@ -40,7 +40,6 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 					}
 					Notify(*m)
 				}
-				// os.Exit(1)
 			}
 			if notifyme == 1 {
 				m := &Message{
@@ -65,7 +64,6 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 					}
 					Notify(*m)
 				}
-				// os.Exit(1)
 			}
 		}()
 	}
@@ -73,6 +71,7 @@ func GitPushPull(p, branch, command string, wg *sync.WaitGroup, notifyme int, no
 	wg.Done()
 }
 
+// Grabs the remote b
 func getRemote(path string) (string, error) {
 	var (
 		err    error
@@ -84,17 +83,21 @@ func getRemote(path string) (string, error) {
 		log.Println(err)
 	}
 
+	// get the remote command output
 	remoteCmd := exec.Command("git", "remote")
 	remoteStdout, err := remoteCmd.Output()
 
+	// Split output on the new line and turn it into a slice.
 	rSplit := strings.Split(string(remoteStdout), "\n")
 	lineArr := rSplit[0 : len(rSplit)-1]
 
+	// get only the origin
 	for _, v := range lineArr {
 		if v == "origin" {
 			remote = v
 		}
 	}
+
 	if remote == "" && len(lineArr) < 2 {
 		remote = lineArr[0]
 	}

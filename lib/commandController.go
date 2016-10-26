@@ -21,7 +21,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		log.Println(err)
 		os.Exit(1)
 	}
+
 	var commitCounter, pushCounter int
+
 	for {
 		var (
 			dataUser []User
@@ -162,6 +164,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			switch gitCommand {
 			case "commit":
 				if commitCounter >= 1 {
+					// Get current times for commit.
 					ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
 					if err != nil {
 						log.Println(err)
@@ -181,8 +184,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 						time.Sleep(15 * time.Second)
 					}
 
+					// Read file, git add, git commit each file in the git status output.
 					for _, s := range status {
-						// reads the file it is currently on. Takes 15 seconds
+						// reads the file it is currently on.
 						dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
 						formatSlice := strings.Join(dataSlice, "\n-")
 						wg.Add(2)
@@ -191,7 +195,6 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					}
 
 					if ctime != 0 {
-						// a delay in the for loop
 						Ticker(ctime)
 					} else {
 						Ticker(settingObj.SettingAddPullCommit.TimeMin)
@@ -199,6 +202,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				}
 			case "push":
 				if pushCounter >= 1 {
+					// Get current push time.
 					ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
 					if err != nil {
 						log.Println(err)

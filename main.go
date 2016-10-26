@@ -27,7 +27,6 @@ func main() {
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
 		fmt.Println(logo)
-
 		fmt.Println("\tWelcome to Forgit CLI")
 		fmt.Println("\t  Let's GIT to it!")
 		fmt.Println("     > forgit help [-h, h, --help]")
@@ -35,6 +34,7 @@ func main() {
 		return nil
 	}
 
+	// Commands that the user can run. Using the github.com/urfave/cli.
 	app.Commands = []cli.Command{
 		{
 			Name:        "init",

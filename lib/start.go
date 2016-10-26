@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// settingGroupsCheck checks if the user object has the matching group name.
 func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
 	for u := range dataUser.Settings {
 		if dataUser.Settings[u].Name == groupName {
@@ -23,7 +24,8 @@ func settingGroupsCheck(groupName string, dataUser User) (Setting, bool) {
 	return dataUser.Settings[0], false
 }
 
-// ForgitDirReposNames ...
+// ForgitDirReposNames reads the Forgit directory, then checks if those
+// directories are git repos by looking for the .git dir.
 func ForgitDirReposNames(path string) []string {
 	var forgitDirReposNameSlice []string
 	// read forgit directory
@@ -48,7 +50,7 @@ func ForgitDirReposNames(path string) []string {
 	return forgitDirReposNameSlice
 }
 
-// InternetCheck Checks if internet exists
+// InternetCheck Checks if internet exists by calling google.
 func InternetCheck() bool {
 	_, err := http.Get("http://google.com/")
 	if err != nil {
@@ -58,7 +60,10 @@ func InternetCheck() bool {
 	return true
 }
 
-// Start ...
+// Start is the main controller for the app that:
+// - Calls the forgit server.
+// - Checks the internet.
+// - Dispatches commands based on the request from user.
 func Start(c *cli.Context) {
 
 	var (
@@ -113,16 +118,19 @@ func Start(c *cli.Context) {
 		dataUser[0].Settings = setdata
 	}
 
-	// update time
+	// update time and format it to unix
 	dn = time.Now().UTC().Unix()
 	dateNow = strconv.FormatInt(dn, 10)
 	dataUser[0].UpdateTime = dateNow
 
+	// Unpack the json data.
 	databytes, err := json.MarshalIndent(dataUser, "", "    ")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
+	// Update the config file.
 	err = ioutil.WriteFile(homeDir.HomeDir+"/.forgitConf.json", databytes, 0644)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -146,28 +154,28 @@ func Start(c *cli.Context) {
 		group = "-1"
 	}
 
-	// if commit set value
+	// If commit set value.
 	if c.IsSet("commit") && c.Int("commit") != 0 && group == "-1" {
 		commit = c.Int("commit")
 	} else {
 		commit = -1
 	}
 
-	// if push set value
+	// If push set value.
 	if c.IsSet("push") && c.Int("push") != 0 && group == "-1" {
 		push = c.Int("push")
 	} else {
 		push = -1
 	}
 
-	// git byte array from MarshalIndent
+	// Get byte array from MarshalIndent
 	_, err = json.MarshalIndent(dataUser, "", "    ")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	// if no push,commit, or group set. Grab setting with status of 1
+	// If no push,commit, or group set. Grab setting with status of 1
 	if c.IsSet("push") == false && c.IsSet("commit") == false && group == "-1" {
 		for s := range dataUser[0].Settings {
 			if dataUser[0].Settings[s].Status == 1 {
@@ -191,7 +199,6 @@ func Start(c *cli.Context) {
 
 	// If push or commit set and no group build a struct.
 	// This only lasts per session
-
 	if settingObj.Name == "" {
 		var (
 			setPush   SettingPush
@@ -258,6 +265,7 @@ func Start(c *cli.Context) {
 		os.Exit(1)
 	}
 
+	// Create a WaitGroup for the go routines
 	var wg sync.WaitGroup
 
 	// Make a goroutine if commit is true
