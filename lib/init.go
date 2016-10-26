@@ -53,7 +53,7 @@ func Init() {
 		fmt.Println("[]")
 		fmt.Println("[] Suggest going to the directory and running pwd command to get its path.")
 		fmt.Println("   [ or ]")
-		fmt.Println("[] Try Again --> fgt init")
+		fmt.Println("[] Try Again --> forgit init")
 		return
 	}
 

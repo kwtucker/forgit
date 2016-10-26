@@ -94,7 +94,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					if len(repoArr) == 0 {
 						log.Println(": You don't have any repos to automate.\n" +
 							"\tOr you don't have any selected in setting group.\n" +
-							"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
+							"\tSelect repos in the " + settingObj.Name + " workspace and restart. forgit start")
 						if settingObj.OnError == 1 {
 							m := &Message{
 								Title: "Setting Repo Error",
@@ -113,7 +113,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		if len(repos) == 0 {
 			log.Println(": You don't have any repos to automate.\n" +
 				"\tOr you don't have any selected in setting group.\n" +
-				"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
+				"\tSelect repos in the " + settingObj.Name + " workspace and restart. forgit start")
 			os.Exit(1)
 		}
 

@@ -21,16 +21,16 @@ func main() {
 `
 
 	app := cli.NewApp()
-	app.Name = "fgt"
+	app.Name = "forgit"
 	app.Author = "Kevin Tucker\n\t https://github.com/kwtucker"
-	app.Usage = "fgt"
+	app.Usage = "forgit"
 	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
 		fmt.Println(logo)
 
 		fmt.Println("\tWelcome to Forgit CLI")
 		fmt.Println("\t  Let's GIT to it!")
-		fmt.Println("     > fgt help [-h, h, --help]")
+		fmt.Println("     > forgit help [-h, h, --help]")
 		fmt.Println()
 		return nil
 	}
@@ -39,7 +39,7 @@ func main() {
 		{
 			Name:        "init",
 			Aliases:     []string{"i"},
-			Usage:       "fgt init",
+			Usage:       "forgit init",
 			Description: "Creates the config file in your home directory that the app uses.",
 			Action: func(c *cli.Context) error {
 				lib.Init()
@@ -49,14 +49,14 @@ func main() {
 		{
 			Name:        "start",
 			Aliases:     []string{"s"},
-			Usage:       "fgt start",
+			Usage:       "forgit start",
 			Description: "Starts app and automates based on you forgit settings.",
 			ArgsUsage:   "NUMBER-MINUTES",
 			Subcommands: []cli.Command{
 				{
 					Name:        "group",
 					Aliases:     []string{"g"},
-					Usage:       "fgt start group GROUP-NAME",
+					Usage:       "forgit start group GROUP-NAME",
 					Description: "Set Workspace setting group",
 					Action: func(c *cli.Context) error {
 						lib.Start(c)
@@ -78,7 +78,7 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				fmt.Println("To select a Workspace")
-				fmt.Println("-->  fgt start group GROUP-NAME")
+				fmt.Println("-->  forgit start group GROUP-NAME")
 				lib.Start(c)
 				return nil
 			},
@@ -86,9 +86,9 @@ func main() {
 		{
 			Name:    "stop",
 			Aliases: []string{"sp"},
-			Usage:   "To stop the app you must do ONE of the following: \n\t\t1. Close the fgt shell window.\n\t\t2. Control-c in the fgt window.",
+			Usage:   "To stop the app you must do ONE of the following: \n\t\t1. Close the forgit shell window.\n\t\t2. Control-c in the forgit window.",
 			Action: func(c *cli.Context) error {
-				fmt.Println("To stop the app you must do ONE of the following: \n\t1. Close the fgt shell window.\n\t2. Control-c in the fgt window.")
+				fmt.Println("To stop the app you must do ONE of the following: \n\t1. Close the forgit shell window.\n\t2. Control-c in the forgit window.")
 				return nil
 			},
 		},

@@ -171,6 +171,6 @@ func BuildConfig(forgitPath string, uuid string) {
 	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir, uuid, "init")
 
 	fmt.Println("\n\tYour Config Is In --> " + homeDir.HomeDir + "/.forgitConf.json\n")
-	fmt.Println("\n\tNow Run --> " + "fgt start\n")
+	fmt.Println("\n\tNow Run --> " + "forgit start\n")
 
 }

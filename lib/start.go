@@ -88,7 +88,7 @@ func Start(c *cli.Context) {
 	if _, err = os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
 		fmt.Println()
 		fmt.Println("* Haven't started yet!")
-		fmt.Println("* Please first run --> fgt init ")
+		fmt.Println("* Please first run --> forgit init ")
 		fmt.Println()
 		return
 	}
@@ -231,7 +231,7 @@ func Start(c *cli.Context) {
 
 		// Struct build for the session setting
 		settingObj = Setting{
-			Name:   "fgtDefault",
+			Name:   "forgitDefault",
 			Status: 1,
 			SettingNotifications: SettingNotifications{
 				OnError:  1,
@@ -254,7 +254,7 @@ func Start(c *cli.Context) {
 	if len(automateRepos) == 0 {
 		log.Println(": You don't have any repos to automate.\n" +
 			"\tOr you don't have any selected in setting group.\n" +
-			"\tSelect repos in the " + settingObj.Name + " workspace and restart. fgt start")
+			"\tSelect repos in the " + settingObj.Name + " workspace and restart. forgit start")
 		os.Exit(1)
 	}
 
