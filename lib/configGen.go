@@ -34,50 +34,53 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 
 	// Set to user struct for local file
 	json.Unmarshal(existfile, &fileu)
+	isInternet := InternetCheck()
+	if isInternet {
 
-	curldata, err = Curlforgit(reqt, uuid)
-	if err != nil {
-		log.Println(err)
-	}
+		curldata, err = Curlforgit(reqt, uuid)
+		if err != nil {
+			log.Println(err)
+		}
 
-	if len(curldata) > 200 {
-		// Format curl data and set it to settings array
-		err = json.Unmarshal(curldata, &setdata)
-		fileu[0].Settings = setdata
-		update = true
-	} else {
-		update = false
-	}
-
-	if update {
-		// Update the path in json
-		if reqt == "init" {
-			if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
-				err = os.Mkdir(forgitPath+"Forgit/", 0700)
-				if err != nil {
-					fmt.Println(err)
-				}
-			}
-			fileu[0].ForgitPath = forgitPath + "Forgit/"
-			fileu[0].ForgitID = uuid
+		if len(curldata) > 200 {
+			// Format curl data and set it to settings array
+			err = json.Unmarshal(curldata, &setdata)
+			fileu[0].Settings = setdata
+			update = true
 		} else {
-			fileu[0].ForgitPath = forgitPath
+			update = false
 		}
 
-		fileu[0].UpdateTime = dateNow
+		if update {
+			// Update the path in json
+			if reqt == "init" {
+				if _, err = os.Stat(forgitPath + "Forgit/"); os.IsNotExist(err) {
+					err = os.Mkdir(forgitPath+"Forgit/", 0700)
+					if err != nil {
+						fmt.Println(err)
+					}
+				}
+				fileu[0].ForgitPath = forgitPath + "Forgit/"
+				fileu[0].ForgitID = uuid
+			} else {
+				fileu[0].ForgitPath = forgitPath
+			}
 
-		// git byte array from MarshalIndent
-		databytes, err := json.MarshalIndent(fileu, "", "    ")
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
+			fileu[0].UpdateTime = dateNow
 
-		// Write to file with updated info
-		err = ioutil.WriteFile(path, databytes, 0644)
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			// git byte array from MarshalIndent
+			databytes, err := json.MarshalIndent(fileu, "", "    ")
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+
+			// Write to file with updated info
+			err = ioutil.WriteFile(path, databytes, 0644)
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
 		}
 	}
 }

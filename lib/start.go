@@ -52,8 +52,7 @@ func ForgitDirReposNames(path string) []string {
 func InternetCheck() bool {
 	_, err := http.Get("http://google.com/")
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("No internet")
+		fmt.Println("\nNo internet")
 		return false
 	}
 	return true
@@ -101,14 +100,17 @@ func Start(c *cli.Context) {
 	}
 	json.Unmarshal(configfile, &dataUser)
 
-	// Grab most recent data and set it to the datauser
-	curldata, err := Curlforgit("init", dataUser[0].ForgitID)
-	if err != nil {
-		log.Println(err)
+	if internetConnection {
+		var curldata []byte
+		// Grab most recent data and set it to the datauser
+		curldata, err = Curlforgit("init", dataUser[0].ForgitID)
+		if err != nil {
+			log.Println(err)
+		}
+		var setdata []Setting
+		json.Unmarshal(curldata, &setdata)
+		dataUser[0].Settings = setdata
 	}
-	var setdata []Setting
-	json.Unmarshal(curldata, &setdata)
-	dataUser[0].Settings = setdata
 
 	// update time
 	dn = time.Now().UTC().Unix()
@@ -125,8 +127,6 @@ func Start(c *cli.Context) {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-
-	// FileExist(homeDir.HomeDir+"/.forgitConf.json", dataUser[0].ForgitPath+"Forgit/", homeDir.HomeDir, dataUser[0].ForgitID, "no")
 
 	fmt.Println("\nThis session will have the following settings:")
 
@@ -160,7 +160,6 @@ func Start(c *cli.Context) {
 	}
 
 	// git byte array from MarshalIndent
-	// configDataBytes, err := json.MarshalIndent(dataUser, "", "    ")
 	_, err = json.MarshalIndent(dataUser, "", "    ")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -264,7 +263,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingAddPullCommit.TimeMin > 0 {
 		if settingObj.SettingAddPullCommit.TimeMin >= 1 {
 			wg.Add(1)
-			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, "commit")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, internetConnection, "commit")
 		}
 	}
 
@@ -272,7 +271,7 @@ func Start(c *cli.Context) {
 	if settingObj.SettingPush.TimeMin > 0 {
 		if settingObj.SettingPush.TimeMin >= 1 && internetConnection == true {
 			wg.Add(1)
-			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, "push")
+			go CommandController(settingObj, dataUser[0].ForgitPath, automateRepos, dataUser[0].ForgitID, internetConnection, "push")
 		}
 	}
 	// This will make the program stay alive until go routines are done
