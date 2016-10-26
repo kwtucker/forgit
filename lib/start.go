@@ -100,6 +100,7 @@ func Start(c *cli.Context) {
 	}
 	json.Unmarshal(configfile, &dataUser)
 
+	// If the internetConnection is true
 	if internetConnection {
 		var curldata []byte
 		// Grab most recent data and set it to the datauser

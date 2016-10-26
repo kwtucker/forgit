@@ -36,6 +36,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		}
 		json.Unmarshal(configfile, &dataUser)
 
+		// If the internet is true it will call to the server and update user object.
 		if internet {
 			// Grab most recent data and set it to the datauser
 			curldata, err := Curlforgit("no", dataUser[0].ForgitID)
@@ -165,6 +166,8 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					if err != nil {
 						log.Println(err)
 					}
+
+					// Only if there is internet will it pull.
 					if internet {
 						wg.Add(1)
 						go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
