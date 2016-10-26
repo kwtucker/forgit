@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/kwtucker/fgt/lib"
+	"github.com/kwtucker/forgit/lib"
 	"github.com/urfave/cli"
 	"os"
 )

@@ -1,20 +1,20 @@
 ![forgit logo](/forgit_md_logo.png)
 
-# FGT CLI
+# Forgit CLI
 This works along with the Forgit Web App. This lives on you local machine and automates your git add, commit, pull, and push workflow.
 ***
 
 ### Commands
 
-#### fgt init
+#### forgit init
 You need to be connected to the internet for this command. Sets up computer environment. It will create a hidden file in $HOME directroy called .forgitConf.json and a Forgit directory from the path you type in.
 
 ```
-$ fgt init
+$ forgit init
 ```
 **Or**
 ```
-$ fgt i
+$ forgit i
 ```  
 * **Output**  
     <> Your Current Absolute Path is -> /Users/user/current/path/  
@@ -24,17 +24,17 @@ $ fgt i
 
 ___
 
-#### fgt start
+#### forgit start
 This command has a few params you can pass in. In general it will start the app with the setting workspace that is already selected on the web interface.  
   * **General**  
 
     ```
-    $ fgt start
+    $ forgit start
     ```  
 
     * **Output**:  
         To select a Workspace  
-        -->  fgt start group GROUP-NAME  
+        -->  forgit start group GROUP-NAME  
         This session will have the following settings:  
         Setting Name:  General  
         Commit Time:  1  
@@ -47,14 +47,14 @@ This command has a few params you can pass in. In general it will start the app 
     Push time minutes param: **-p**
 
     ```
-    $ fgt start -c 5 -p 30
+    $ forgit start -c 5 -p 30
     ```
 
     * **Output**:  
         To select a Workspace  
-        -->  fgt start group GROUP-NAME  
+        -->  forgit start group GROUP-NAME  
         This session will have the following settings:  
-        Setting Name:  fgtDefault  
+        Setting Name:  forgitDefault  
         Commit Time:  2  
         Push Time:  2
 
@@ -65,7 +65,7 @@ This command has a few params you can pass in. In general it will start the app 
     select workspace param: **g**  
 
     ```
-    $ fgt start g General
+    $ forgit start g General
     ```
 
     * **Output**:  
@@ -76,24 +76,24 @@ This command has a few params you can pass in. In general it will start the app 
 
 ___
 
-#### fgt stop  
+#### forgit stop  
 
  * **Output**:   
   To stop the app you must do ONE of the following:  
-  1. Close the fgt shell window.  
-  2. Control-c in the fgt window.
+  1. Close the forgit shell window.  
+  2. Control-c in the forgit window.
 
 ___
 
-#### fgt help
+#### forgit help
 Help will show possible commands and how to use them.  
 
 ```
-$ fgt help
+$ forgit help
 ```
 
 **Or**
 
 ```
-$ fgt h
+$ forgit h
 ```
