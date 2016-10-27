@@ -24,7 +24,7 @@ func main() {
 	app.Name = "forgit"
 	app.Author = "Kevin Tucker\n\t https://github.com/kwtucker"
 	app.Usage = "forgit"
-	app.Version = "v1.1.1"
+	app.Version = "v1.1.2"
 	app.Action = func(c *cli.Context) error {
 		fmt.Println(logo)
 		fmt.Println("\tWelcome to Forgit CLI")
