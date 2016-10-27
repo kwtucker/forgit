@@ -4,6 +4,26 @@
 This works along with the Forgit Web App. This lives on you local machine and automates your git add, commit, pull, and push workflow.
 ***
 
+### Install
+This CLI is designed to only work with the ForgitWeb Repository and not to be run without an account on [forgit.whalebyte.com](http://forgit.whalebyte.com/).
+ - While this is a private repository you will need to clone the repo instead of go get command. Both methods are listed.
+
+```
+$ go get github.com/kwtucker/forgit
+
+  or
+
+$ git clone https://github.com/kwtucker/forgit.git
+```
+
+Then install it:
+
+```
+$ cd /path/to/github.com/kwtucker/forgit
+$ go install
+```
+
+
 ### Commands
 
 #### forgit init
