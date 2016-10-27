@@ -174,6 +174,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					if internet {
 						wg.Add(1)
 						go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
+						time.Sleep(4 * time.Second)
 					}
 					if settingObj.OnCommit == 1 {
 						m := &Message{
@@ -191,7 +192,9 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 						formatSlice := strings.Join(dataSlice, "\n-")
 						wg.Add(2)
 						go GitAdd(s, &wg)
+						time.Sleep(500 * time.Millisecond)
 						go GitCommit(formatSlice, &wg, notecommit, noteerr)
+						time.Sleep(500 * time.Millisecond)
 					}
 
 					if ctime != 0 {
