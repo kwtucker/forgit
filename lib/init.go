@@ -73,6 +73,7 @@ func Init() {
 	fmt.Print("<> Enter UUID from Forgit Online Terminal Page: ")
 	scanner.Scan()
 	uuid = scanner.Text()
+	strings.TrimSpace(uuid)
 
 	// build the config
 	BuildConfig(string(path), string(uuid))
