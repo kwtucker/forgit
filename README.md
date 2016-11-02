@@ -45,7 +45,7 @@ $ forgit i
 ___
 
 #### forgit start
-This command has a few params you can pass in. In general it will start the app with the setting workspace that is already selected on the web interface.  
+This command has a few params you can pass in. In general it will start the app with the setting group that is already selected on the web interface.  
   * **General**  
 
     ```
@@ -53,7 +53,7 @@ This command has a few params you can pass in. In general it will start the app 
     ```  
 
     * **Output**:  
-        To select a Workspace  
+        To select a setting group. 
         -->  forgit start group GROUP-NAME  
         This session will have the following settings:  
         Setting Name:  General  
@@ -71,7 +71,7 @@ This command has a few params you can pass in. In general it will start the app 
     ```
 
     * **Output**:  
-        To select a Workspace  
+        To select a setting group  
         -->  forgit start group GROUP-NAME  
         This session will have the following settings:  
         Setting Name:  forgitDefault  
@@ -80,9 +80,9 @@ This command has a few params you can pass in. In general it will start the app 
 
         ___
 
-  * **Setting Workspace**  
-    The workspace name has to be spelled exact or it will not work.  
-    select workspace param: **g**  
+  * **Setting Group**  
+    The setting group name has to be spelled exact or it will not work.  
+    select setting group param: **g**  
 
     ```
     $ forgit start g General
