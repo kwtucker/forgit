@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kwtucker/fileReader"
 	"io/ioutil"
 	"log"
@@ -46,7 +47,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				log.Println(err)
 			}
 
-			// if it is bad creds
+			// if it is bad UUID was entered. The curl data will always be 42 bytes for bad result.
 			if len(curldata) == 42 {
 				var aerr APIError
 				err = json.Unmarshal(curldata, &aerr)
@@ -55,16 +56,20 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				}
 				// If the forgit Id is wrong
 				if aerr.Status == 401 {
-					log.Println(": bad credentials, Redownload Forgit")
+					fmt.Println("Bad UUID credentials,")
+					fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on the browser.")
+					fmt.Println(" 2. If you did not get the CLI you are using from forgit.whalebyte.com, be sure to \nlogin to forgit.whalebyte.com and get your own UUID from the dashboard.")
 					if settingObj.OnError == 1 {
 						m := &Message{
-							Title: "User Id Wrong",
-							Body:  "User Id Wrong. Redownload Forgit",
+							Title: "User UUID Wrong",
+							Body:  "Refer to your Terminal",
 						}
 						Notify(*m)
 					}
 					os.Exit(1)
 				}
+			} else {
+				fmt.Println("Got a unexpected response from API")
 			}
 			// if it is greater than 200 data was updated.
 			if len(curldata) > 200 {

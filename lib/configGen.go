@@ -43,6 +43,15 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 		if err != nil {
 			log.Println(err)
 		}
+		// The response for a bad request will always be 42 bytes
+		if len(curldata) == 42 {
+			fmt.Println("Bad UUID credentials,")
+			fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on the browser.")
+			fmt.Println(" 2. If you did not get the CLI you are using from forgit.whalebyte.com, be sure to \nlogin to forgit.whalebyte.com and get your own UUID from the dashboard.")
+			os.Exit(1)
+		} else {
+			fmt.Println("Curl data on init returned something unexpected.\nTry forgit init again.")
+		}
 
 		// If the data returned is large update the settings.
 		if len(curldata) > 200 {
