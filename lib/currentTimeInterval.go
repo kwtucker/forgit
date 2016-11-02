@@ -6,8 +6,8 @@ import (
 	osuser "os/user"
 )
 
-// GetCurrentCPTimeMin gets the current time interval for either commit or push
-func GetCurrentCPTimeMin(setObj Setting, gitCom string) (int, int, int, int, error) {
+// GetCurrentCommitPushTimeMin gets the current time interval for either commit or push
+func GetCurrentCommitPushTimeMin(setObj Setting, gitCom string) (int, int, int, int, error) {
 	var (
 		fileu                         []User
 		cptime                        int

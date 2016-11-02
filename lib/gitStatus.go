@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-// Status gets the git status of the repos directory
-func Status(p string) ([]string, error) {
+// GitStatus gets the git status of the repos directory
+func GitStatus(p string) ([]string, error) {
 	var (
 		err      error
 		fileName string

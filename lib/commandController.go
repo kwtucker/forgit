@@ -68,9 +68,8 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					}
 					os.Exit(1)
 				}
-			} else {
-				fmt.Println("Got a unexpected response from API")
 			}
+
 			// if it is greater than 200 data was updated.
 			if len(curldata) > 200 {
 				// Format curl data and set it to settings array
@@ -160,7 +159,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			// get status slice
 			// Wait tell the status slice is generated
-			status, err := Status(path + repos[r].Name)
+			status, err := GitStatus(path + repos[r].Name)
 			if err != nil {
 				log.Println(err)
 			}
@@ -170,7 +169,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			case "commit":
 				if commitCounter >= 1 {
 					// Get current times for commit.
-					ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
+					ctime, noteerr, notecommit, _, err := GetCurrentCommitPushTimeMin(settingObj, "commit")
 					if err != nil {
 						log.Println(err)
 					}
@@ -211,7 +210,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			case "push":
 				if pushCounter >= 1 {
 					// Get current push time.
-					ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
+					ptime, noteerr, _, notepush, err := GetCurrentCommitPushTimeMin(settingObj, "push")
 					if err != nil {
 						log.Println(err)
 					}

@@ -11,9 +11,8 @@ import (
 	"time"
 )
 
-// FileExist Tells the user that the file exists and returns the config data
-// func FileExist(path string, forgitPath string, homeDir string) []byte {
-func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt string) {
+// ConfigFileReadUpdate Tells the user that the file exists and returns the config data
+func ConfigFileReadUpdate(path string, forgitPath string, homeDir string, uuid string, reqt string) {
 	var (
 		fileu    []User
 		dn       int64
@@ -98,8 +97,7 @@ func FileExist(path string, forgitPath string, homeDir string, uuid string, reqt
 }
 
 // Creates a config file and puts server data to it.
-// func fileNotExist(homeDir string, j []byte, forgitPath string) {
-func fileNotExist(homeDir string, uuid string, forgitPath string) {
+func createConfigFileIfNotExist(homeDir string, uuid string, forgitPath string) {
 	var (
 		f    *os.File
 		err  error
@@ -168,7 +166,7 @@ func fileNotExist(homeDir string, uuid string, forgitPath string) {
 	// save
 	f.Sync()
 
-	FileExist(homeDir+"/.forgitConf.json", forgitPath, homeDir, uuid, "init")
+	ConfigFileReadUpdate(homeDir+"/.forgitConf.json", forgitPath, homeDir, uuid, "init")
 }
 
 // BuildConfig ...
@@ -182,11 +180,10 @@ func BuildConfig(forgitPath string, uuid string) {
 
 	// If config file doesn't exist. Create it
 	if _, err = os.Stat(homeDir.HomeDir + "/.forgitConf.json"); os.IsNotExist(err) {
-		fileNotExist(homeDir.HomeDir, uuid, forgitPath)
+		createConfigFileIfNotExist(homeDir.HomeDir, uuid, forgitPath)
 	}
 
-	// File Exists Print
-	FileExist(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir, uuid, "init")
+	ConfigFileReadUpdate(homeDir.HomeDir+"/.forgitConf.json", forgitPath, homeDir.HomeDir, uuid, "init")
 
 	fmt.Println("\n\tYour Config Is In --> " + homeDir.HomeDir + "/.forgitConf.json\n")
 	fmt.Println("\n\tNow Run --> " + "forgit start\n")
