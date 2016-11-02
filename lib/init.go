@@ -70,7 +70,7 @@ func Init() {
 
 	// Grab the UUID.
 	scanner = bufio.NewScanner(os.Stdin)
-	fmt.Print("<> Enter UUID from Forgit Online Terminal Page: ")
+	fmt.Print("<> Enter UUID from Forgit Online Dashboard Page: ")
 	scanner.Scan()
 	uuid = scanner.Text()
 	strings.TrimSpace(uuid)

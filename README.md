@@ -40,7 +40,7 @@ $ forgit i
     <> Your Current Absolute Path is -> /Users/user/current/path/  
     <>  Path cannot contain Forgit name.  
     <> Enter Absolute path where you want the Forgit directory [ Enter For Here ]: /PATH/  
-    <> Enter UUID from Forgit Online Terminal Page: YOUR ID
+    <> Enter UUID from Forgit Online Dashboard Page: YOUR ID
 
 ___
 
@@ -53,7 +53,7 @@ This command has a few params you can pass in. In general it will start the app 
     ```  
 
     * **Output**:  
-        To select a setting group. 
+        To select a setting group.
         -->  forgit start group GROUP-NAME  
         This session will have the following settings:  
         Setting Name:  General  

@@ -57,7 +57,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				// If the forgit Id is wrong
 				if aerr.Status == 401 {
 					fmt.Println("Bad UUID credentials,")
-					fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on the browser.")
+					fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on your browser. http://forgit.whalebyte.com/dashboard/")
 					fmt.Println(" 2. If you did not get the CLI you are using from forgit.whalebyte.com, be sure to \nlogin to forgit.whalebyte.com and get your own UUID from the dashboard.")
 					if settingObj.OnError == 1 {
 						m := &Message{
