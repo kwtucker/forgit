@@ -10,6 +10,7 @@ import (
 	"os"
 	osuser "os/user"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -141,12 +142,12 @@ func Start(c *cli.Context) {
 
 	// If group exists grab group name and set the values
 	if c.Args().First() != "" {
-		group = c.Args().First()
+		group = strings.ToLower(c.Args().First())
 		settingObj, setExist = settingGroupsCheck(group, dataUser[0])
 		if setExist == false {
 			fmt.Println()
 			fmt.Println("* Did Not Start!")
-			fmt.Println("* Setting group does not exist.")
+			fmt.Println("* Setting group does not exist. Check the spelling.")
 			fmt.Println()
 			return
 		}
@@ -238,7 +239,7 @@ func Start(c *cli.Context) {
 
 		// Struct build for the session setting
 		settingObj = Setting{
-			Name:   "forgitDefault",
+			Name:   "forgit_default",
 			Status: 1,
 			SettingNotifications: SettingNotifications{
 				OnError:  1,
@@ -261,7 +262,7 @@ func Start(c *cli.Context) {
 	if len(automateRepos) == 0 {
 		log.Println(": You don't have any repos to automate.\n" +
 			"\tOr you don't have any selected in setting group.\n" +
-			"\tSelect repos in the " + settingObj.Name + " setting group and restart. forgit start")
+			"\tSelect repos in the " + settingObj.Name + " setting group at http://forgit.whalebyte.com/ and restart. forgit start")
 		os.Exit(1)
 	}
 
