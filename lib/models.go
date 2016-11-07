@@ -19,7 +19,6 @@ type UpdateStatus struct {
 
 // User ..
 type User struct {
-	// GithubID   int       `json:"githubID"`
 	ForgitID   string    `json:"forgitID"`
 	ForgitPath string    `json:"forgitPath"`
 	UpdateTime string    `json:"updateTime"`

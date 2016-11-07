@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/kwtucker/fileReader"
 	"io/ioutil"
 	"log"
@@ -46,7 +47,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				log.Println(err)
 			}
 
-			// if it is bad creds
+			// if it is bad UUID was entered. The curl data will always be 42 bytes for bad result.
 			if len(curldata) == 42 {
 				var aerr APIError
 				err = json.Unmarshal(curldata, &aerr)
@@ -55,17 +56,20 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 				}
 				// If the forgit Id is wrong
 				if aerr.Status == 401 {
-					log.Println(": bad credentials, Redownload Forgit")
+					fmt.Println("Bad UUID credentials,")
+					fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on your browser. http://forgit.whalebyte.com/dashboard/")
+					fmt.Println(" 2. If you did not get the CLI you are using from forgit.whalebyte.com, be sure to \nlogin to forgit.whalebyte.com and get your own UUID from the dashboard.")
 					if settingObj.OnError == 1 {
 						m := &Message{
-							Title: "User Id Wrong",
-							Body:  "User Id Wrong. Redownload Forgit",
+							Title: "User UUID Wrong",
+							Body:  "Refer to your Terminal",
 						}
 						Notify(*m)
 					}
 					os.Exit(1)
 				}
 			}
+
 			// if it is greater than 200 data was updated.
 			if len(curldata) > 200 {
 				// Format curl data and set it to settings array
@@ -98,7 +102,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 						if len(repoArr) == 0 {
 							log.Println(": You don't have any repos to automate.\n" +
 								"\tOr you don't have any selected in setting group.\n" +
-								"\tSelect repos in the " + settingObj.Name + " workspace and restart. forgit start")
+								"\tSelect repos in the " + settingObj.Name + " setting group at http://forgit.whalebyte.com/ and restart. forgit start")
 							if settingObj.OnError == 1 {
 								m := &Message{
 									Title: "Setting Repo Error",
@@ -118,7 +122,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 		if len(repos) == 0 {
 			log.Println(": You don't have any repos to automate.\n" +
 				"\tOr you don't have any selected in setting group.\n" +
-				"\tSelect repos in the " + settingObj.Name + " workspace and restart. forgit start")
+				"\tSelect repos in the " + settingObj.Name + " setting group at http://forgit.whalebyte.com/ and restart. forgit start")
 			os.Exit(1)
 		}
 
@@ -155,7 +159,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 
 			// get status slice
 			// Wait tell the status slice is generated
-			status, err := Status(path + repos[r].Name)
+			status, err := GitStatus(path + repos[r].Name)
 			if err != nil {
 				log.Println(err)
 			}
@@ -165,7 +169,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			case "commit":
 				if commitCounter >= 1 {
 					// Get current times for commit.
-					ctime, noteerr, notecommit, _, err := GetCurrentCPTimeMin(settingObj, "commit")
+					ctime, noteerr, notecommit, _, err := GetCurrentCommitPushTimeMin(settingObj, "commit")
 					if err != nil {
 						log.Println(err)
 					}
@@ -206,7 +210,7 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 			case "push":
 				if pushCounter >= 1 {
 					// Get current push time.
-					ptime, noteerr, _, notepush, err := GetCurrentCPTimeMin(settingObj, "push")
+					ptime, noteerr, _, notepush, err := GetCurrentCommitPushTimeMin(settingObj, "push")
 					if err != nil {
 						log.Println(err)
 					}
