@@ -174,37 +174,41 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 						log.Println(err)
 					}
 
-					// Only if there is internet will it pull.
-					if internet {
-						wg.Add(1)
-						go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
-						time.Sleep(4 * time.Second)
-					}
-					if settingObj.OnCommit == 1 {
-						m := &Message{
-							Title: "Save Files",
-							Body:  "Forgit Event In 15 seconds",
+					// If it is 0 then commit is off
+					if ctime > 0 {
+
+						// Only if there is internet will it pull.
+						if internet {
+							wg.Add(1)
+							go GitPushPull(path+repos[r].Name, branchName, "pull", &wg, 0, noteerr)
+							time.Sleep(4 * time.Second)
 						}
-						Notify(*m)
-						time.Sleep(15 * time.Second)
-					}
+						if settingObj.OnCommit == 1 {
+							m := &Message{
+								Title: "Save Files",
+								Body:  "Forgit Event In 15 seconds",
+							}
+							Notify(*m)
+							time.Sleep(15 * time.Second)
+						}
 
-					// Read file, git add, git commit each file in the git status output.
-					for _, s := range status {
-						// reads the file it is currently on.
-						dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
-						formatSlice := strings.Join(dataSlice, "\n-")
-						wg.Add(2)
-						go GitAdd(s, &wg)
-						time.Sleep(500 * time.Millisecond)
-						go GitCommit(formatSlice, &wg, notecommit, noteerr)
-						time.Sleep(500 * time.Millisecond)
-					}
+						// Read file, git add, git commit each file in the git status output.
+						for _, s := range status {
+							// reads the file it is currently on.
+							dataSlice = fileReader.ReadFile(path+repos[r].Name+"/"+s, false)
+							formatSlice := strings.Join(dataSlice, "\n-")
+							wg.Add(2)
+							go GitAdd(s, &wg)
+							time.Sleep(500 * time.Millisecond)
+							go GitCommit(formatSlice, &wg, notecommit, noteerr)
+							time.Sleep(500 * time.Millisecond)
+						}
 
-					if ctime != 0 {
-						Ticker(ctime)
-					} else {
-						Ticker(settingObj.SettingAddPullCommit.TimeMin)
+						if ctime != 0 {
+							Ticker(ctime)
+						} else {
+							Ticker(settingObj.SettingAddPullCommit.TimeMin)
+						}
 					}
 				}
 			case "push":
@@ -214,13 +218,17 @@ func CommandController(settingObj Setting, path string, repos []SettingRepo, uui
 					if err != nil {
 						log.Println(err)
 					}
-					wg.Add(1)
-					go GitPushPull(path+repos[r].Name, branchName, "push", &wg, notepush, noteerr)
-					if ptime != 0 {
-						// a delay in the for loop
-						Ticker(ptime)
-					} else {
-						Ticker(settingObj.SettingPush.TimeMin)
+
+					// If the push time is 0, git push is off.
+					if ptime > 0 {
+						wg.Add(1)
+						go GitPushPull(path+repos[r].Name, branchName, "push", &wg, notepush, noteerr)
+						if ptime != 0 {
+							// a delay in the for loop
+							Ticker(ptime)
+						} else {
+							Ticker(settingObj.SettingPush.TimeMin)
+						}
 					}
 				}
 			}
