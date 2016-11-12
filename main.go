@@ -57,7 +57,7 @@ func main() {
 					Name:        "group",
 					Aliases:     []string{"g"},
 					Usage:       "forgit start group GROUP-NAME",
-					Description: "Set Workspace setting group",
+					Description: "Set setting group",
 					Action: func(c *cli.Context) error {
 						lib.Start(c)
 						return nil
@@ -77,7 +77,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				fmt.Println("To select a Workspace")
+				fmt.Println("To select a Setting Group")
 				fmt.Println("-->  forgit start group GROUP-NAME")
 				lib.Start(c)
 				return nil

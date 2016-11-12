@@ -28,7 +28,7 @@ func ConfigFileReadUpdate(path string, forgitPath string, homeDir string, uuid s
 	// Check if the json file is there.
 	existfile, err := ioutil.ReadFile(homeDir + "/.forgitConf.json")
 	if err != nil {
-		fmt.Println(".forgitConf.json Does not exist, Re-download Forgit")
+		fmt.Println(".forgitConf.json Does not exist, Re-Run forgit init")
 		os.Exit(1)
 	}
 
@@ -48,8 +48,6 @@ func ConfigFileReadUpdate(path string, forgitPath string, homeDir string, uuid s
 			fmt.Println(" 1. Try forgit init again and make sure to copy all the UUID from the dashboard on your browser. http://forgit.whalebyte.com/dashboard/")
 			fmt.Println(" 2. If you did not get the CLI you are using from forgit.whalebyte.com, be sure to \nlogin to forgit.whalebyte.com and get your own UUID from the dashboard.")
 			os.Exit(1)
-		} else {
-			fmt.Println("Curl data on init returned something unexpected.\nTry forgit init again.")
 		}
 
 		// If the data returned is large update the settings.
